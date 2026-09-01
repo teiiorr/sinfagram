@@ -12,6 +12,7 @@ import 'package:sinfagram/features/auth/application/session_controller.dart';
 import 'package:sinfagram/features/feed/application/day_page_controller.dart';
 import 'package:sinfagram/features/feed/domain/post.dart';
 import 'package:sinfagram/features/feed/presentation/friends_carousel.dart';
+import 'package:sinfagram/features/board/presentation/school_board_carousel.dart';
 import 'package:sinfagram/features/moderation/presentation/report_sheet.dart';
 import 'package:sinfagram/features/stories/presentation/story_tray.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
@@ -143,6 +144,8 @@ class DayPageScreen extends ConsumerWidget {
         ],
         const StoryTray(),
         const FriendsCarousel(),
+        const SizedBox(height: Space.md),
+        const SchoolBoardCarousel(),
         const SizedBox(height: Space.md),
         if (photos.isEmpty)
           _hpad(EmptyState(
