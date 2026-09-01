@@ -1060,4 +1060,10 @@ class AppL10nKaa extends AppL10n {
 
   @override
   String get boardClassHub => 'Klass jumısları';
+
+  @override
+  String get gamesQuizClose => 'Jabıw';
+
+  @override
+  String get gamesQuizQuestion => 'Soraw';
 }

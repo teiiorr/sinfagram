@@ -54,8 +54,10 @@ class StoryTray extends ConsumerWidget {
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: s.seen ? null : AppGradients.hero,
-                color: s.seen ? colors.border : null,
+                // Unseen: full-spectrum conic ring (static — no spin, by request).
+                // Seen: flat stronger border.
+                gradient: s.seen ? null : AppGradients.storyRing,
+                color: s.seen ? colors.borderStrong : null,
               ),
               child: Container(
                 padding: const EdgeInsets.all(2.5),

@@ -11,9 +11,9 @@ class Reveal extends StatefulWidget {
     super.key,
     required this.child,
     this.index = 0,
-    this.duration = Motion.emphasized,
-    this.rise = Motion.riseMd,
-    this.scaleFrom = 0.98,
+    this.duration = Motion.celebrate,
+    this.rise = 24.0,
+    this.scaleFrom = 0.88,
   });
 
   final Widget child;
@@ -57,9 +57,9 @@ class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _c,
       builder: (context, child) {
-        final t = Motion.emphasize.transform(_c.value);
+        final t = Motion.overshoot.transform(_c.value);
         return Opacity(
-          opacity: _c.value,
+          opacity: _c.value.clamp(0.0, 1.0),
           child: Transform.translate(
             offset: Offset(0, widget.rise * (1 - t)),
             child: Transform.scale(
@@ -80,7 +80,7 @@ class TapScale extends StatefulWidget {
       {super.key,
       required this.child,
       this.onTap,
-      this.pressed = 0.96,
+      this.pressed = 0.9,
       this.haptic = true});
 
   final Widget child;
@@ -114,8 +114,8 @@ class _TapScaleState extends State<TapScale> {
             },
       child: AnimatedScale(
         scale: _down ? widget.pressed : 1.0,
-        duration: motionOf(context, Motion.micro),
-        curve: Motion.press,
+        duration: motionOf(context, Motion.base),
+        curve: Motion.spring,
         child: widget.child,
       ),
     );

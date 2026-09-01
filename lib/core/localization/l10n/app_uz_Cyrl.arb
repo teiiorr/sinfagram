@@ -308,5 +308,7 @@
   "gamesQuizResult": "Натижа",
   "gamesQuizAgain": "Яна бир бор",
   "gamesScore": "Балл",
-  "boardClassHub": "Синф фаолияти"
+  "boardClassHub": "Синф фаолияти",
+  "gamesQuizClose": "Ёпиш",
+  "gamesQuizQuestion": "Савол"
 }

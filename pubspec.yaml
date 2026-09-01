@@ -76,6 +76,15 @@ flutter:
     - assets/cars/
     - assets/flowers/
   fonts:
+    # "Play" redesign — rounded, friendly families (Baloo 2 for display/initials,
+    # Fredoka for everything else). Variable fonts; Flutter maps fontWeight to the
+    # wght axis. Bundled per docs/11 §11.7 (never fetched at runtime).
+    - family: Fredoka
+      fonts:
+        - asset: fonts/fredoka/Fredoka-Variable.ttf
+    - family: Baloo 2
+      fonts:
+        - asset: fonts/baloo2/Baloo2-Variable.ttf
     - family: Inter
       fonts:
         - asset: fonts/inter/Inter-Regular.ttf

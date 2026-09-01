@@ -308,5 +308,7 @@
   "gamesQuizResult": "Результат",
   "gamesQuizAgain": "Ещё раз",
   "gamesScore": "Очки",
-  "boardClassHub": "Активности класса"
+  "boardClassHub": "Активности класса",
+  "gamesQuizClose": "Закрыть",
+  "gamesQuizQuestion": "Вопрос"
 }

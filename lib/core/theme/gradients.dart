@@ -4,18 +4,54 @@ import 'package:flutter/painting.dart';
 /// elevated design). Everything else stays flat and on-token. Brand-consistent
 /// (built on the primary/accent palette) and legible in both themes.
 abstract final class AppGradients {
-  /// Primary CTA — a vivid violet with a depth shift.
+  /// Primary CTA / FAB — vivid violet with a depth shift.
   static const primary = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFF7A5CF0), Color(0xFF5B3FE0)],
   );
 
-  /// Hero surfaces — a bold indigo → violet → pink sweep (creative).
+  /// Feed hero header — indigo → violet → pink (design: 150deg sweep).
   static const hero = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+    colors: [Color(0xFF6A4CE6), Color(0xFF9B4CE6), Color(0xFFF0609B)],
+    stops: [0.0, 0.48, 1.0],
+  );
+
+  /// Profile avatar ring.
+  static const avatarRing = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
     colors: [Color(0xFF5B4FE0), Color(0xFF9B4CE6), Color(0xFFE6568F)],
+  );
+
+  /// Battle hero.
+  static const battle = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF5B4FE0), Color(0xFF8A4CE6), Color(0xFFE6568F)],
+    stops: [0.0, 0.55, 1.0],
+  );
+
+  /// League progress bar — horizontal violet → pink.
+  static const league = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [Color(0xFF7A5CF0), Color(0xFFE6568F)],
+  );
+
+  /// Unseen story ring — a full-spectrum conic sweep (rings are static in this
+  /// build; product owner asked for no spin).
+  static const storyRing = SweepGradient(
+    colors: [
+      Color(0xFF6A4CE6),
+      Color(0xFFEB4D8C),
+      Color(0xFFF2802E),
+      Color(0xFF12B39B),
+      Color(0xFF3A62E0),
+      Color(0xFF6A4CE6),
+    ],
   );
 
   /// Reward / win moments only.
@@ -25,11 +61,12 @@ abstract final class AppGradients {
     colors: [Color(0xFFE7A63A), Color(0xFFD98A12)],
   );
 
-  /// A vivid two-stop gradient from a single accent colour (for [IconTile]).
+  /// A vivid gradient from a single accent colour: accent → accent darkened 35%
+  /// (design spec, 135°). Used for [IconTile], avatars, media placeholders.
   static LinearGradient of(Color c) => LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color.lerp(c, const Color(0xFFFFFFFF), 0.18)!, c],
+        colors: [c, Color.lerp(c, const Color(0xFF000000), 0.35)!],
       );
 }
 

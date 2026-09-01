@@ -30,8 +30,13 @@ abstract final class Motion {
   /// Material-3 "emphasized decelerate" — a confident, modern deceleration.
   static const emphasize = Cubic(0.05, 0.7, 0.1, 1.0);
 
-  /// A soft spring-like settle for entrances and cards.
-  static const spring = Cubic(0.34, 1.2, 0.64, 1.0);
+  /// Bouncy "squish" for button presses and the nav blob — overshoots and
+  /// settles (design handoff: cubic-bezier(.34,1.56,.64,1)).
+  static const spring = Cubic(0.34, 1.56, 0.64, 1.0);
+
+  /// Playful entrance overshoot for staggered list/section reveals
+  /// (design handoff: cubic-bezier(.2,.9,.28,1.3)).
+  static const overshoot = Cubic(0.2, 0.9, 0.28, 1.3);
 
   // Displacements
   static const riseSm = 6.0;
@@ -39,8 +44,8 @@ abstract final class Motion {
   static const riseLg = 20.0;
   static const slideX = 16.0;
 
-  /// Per-item stagger step for list/section entrances.
-  static const stagger = Duration(milliseconds: 55);
+  /// Per-item stagger step for list/section entrances (design handoff: 65ms).
+  static const stagger = Duration(milliseconds: 65);
 }
 
 /// Honour the OS "reduce motion" setting everywhere. Wrap every duration in this.

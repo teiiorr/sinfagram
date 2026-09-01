@@ -475,5 +475,7 @@
   "gamesQuizResult": "Natija",
   "gamesQuizAgain": "Yana bir bor",
   "gamesScore": "Ball",
-  "boardClassHub": "Sinf faoliyati"
+  "boardClassHub": "Sinf faoliyati",
+  "gamesQuizClose": "Yopish",
+  "gamesQuizQuestion": "Savol"
 }

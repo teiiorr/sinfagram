@@ -1953,6 +1953,18 @@ abstract class AppL10n {
   /// In uz, this message translates to:
   /// **'Sinf faoliyati'**
   String get boardClassHub;
+
+  /// No description provided for @gamesQuizClose.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yopish'**
+  String get gamesQuizClose;
+
+  /// No description provided for @gamesQuizQuestion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savol'**
+  String get gamesQuizQuestion;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

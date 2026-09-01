@@ -1098,4 +1098,10 @@ class AppL10nRu extends AppL10n {
 
   @override
   String get boardClassHub => 'Активности класса';
+
+  @override
+  String get gamesQuizClose => 'Закрыть';
+
+  @override
+  String get gamesQuizQuestion => 'Вопрос';
 }

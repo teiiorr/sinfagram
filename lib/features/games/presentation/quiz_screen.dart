@@ -9,8 +9,6 @@ import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
 import 'package:sinfagram/shared/widgets/app_button.dart';
-import 'package:sinfagram/shared/widgets/app_card.dart';
-import 'package:sinfagram/shared/widgets/app_chip.dart';
 import 'package:sinfagram/shared/widgets/icon_tile.dart';
 
 /// A single rapid-quiz question. Local, offline demo content only.
@@ -47,7 +45,7 @@ enum _Phase { intro, playing, result }
 
 /// A solo, offline, 10-question rapid quiz (docs/07 §7.5 — variety alongside the
 /// class battle and league). No network, no images, class-neutral: it is a warm-
-/// up, not a graded score. Colourful cards with a green/red answer flash.
+/// up, not a graded score. Options flash green/red on lock, a trophy caps the run.
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
 
@@ -63,6 +61,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   int get _total => _kQuestions.length;
   bool get _answered => _selected != null;
+  bool get _isLast => _index >= _total - 1;
 
   void _start() => setState(() {
         _phase = _Phase.playing;
@@ -82,7 +81,7 @@ class _QuizScreenState extends State<QuizScreen> {
   void _next() {
     if (!_answered) return;
     setState(() {
-      if (_index >= _total - 1) {
+      if (_isLast) {
         _phase = _Phase.result;
       } else {
         _index++;
@@ -91,11 +90,12 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
+  void _close() => Navigator.of(context).maybePop();
+
   @override
   Widget build(BuildContext context) {
     final l = AppL10n.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l.gamesQuiz)),
       body: SafeArea(
         child: switch (_phase) {
           _Phase.intro => _intro(context, l),
@@ -106,45 +106,71 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+  // Close (X) + optional progress label ("Savol 3 / 10", tabular figures).
+  Widget _header(BuildContext context, AppL10n l, {String? progress}) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+          Space.sm, Space.sm, Space.gutter, Space.sm),
+      child: Row(
+        children: [
+          _CloseButton(onTap: _close, label: l.gamesQuizClose),
+          const Spacer(),
+          if (progress != null)
+            Text(progress,
+                style: AppText.numeric.copyWith(color: colors.textSecondary)),
+        ],
+      ),
+    );
+  }
+
   // ---------------- Intro ----------------
 
   Widget _intro(BuildContext context, AppL10n l) {
     final colors = context.colors;
-    return Padding(
-      padding: const EdgeInsets.all(Space.gutter),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Reveal(
-                index: 0,
-                child: const IconTile(LucideIcons.brain,
-                    color: AppAccents.violet, size: 96)),
-            const SizedBox(height: Space.lg),
-            Reveal(
-              index: 1,
-              child: Text(l.gamesQuiz,
-                  textAlign: TextAlign.center,
-                  style: AppText.h1.copyWith(color: colors.textPrimary)),
+    return Column(
+      children: [
+        _header(context, l),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(Space.gutter),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Reveal(
+                      index: 0,
+                      child: const IconTile(LucideIcons.brain,
+                          color: AppAccents.violet, size: 96)),
+                  const SizedBox(height: Space.lg),
+                  Reveal(
+                    index: 1,
+                    child: Text(l.gamesQuiz,
+                        textAlign: TextAlign.center,
+                        style: AppText.h1.copyWith(color: colors.textPrimary)),
+                  ),
+                  const SizedBox(height: Space.xs),
+                  Reveal(
+                    index: 2,
+                    child: Text(l.gamesQuizDesc,
+                        textAlign: TextAlign.center,
+                        style:
+                            AppText.body.copyWith(color: colors.textSecondary)),
+                  ),
+                  const SizedBox(height: Space.xl),
+                  Reveal(
+                    index: 3,
+                    child: AppButton(l.gamesQuizStart,
+                        size: AppButtonSize.lg,
+                        icon: LucideIcons.zap,
+                        onPressed: _start),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: Space.xs),
-            Reveal(
-              index: 2,
-              child: Text(l.gamesQuizDesc,
-                  textAlign: TextAlign.center,
-                  style: AppText.body.copyWith(color: colors.textSecondary)),
-            ),
-            const SizedBox(height: Space.xl),
-            Reveal(
-              index: 3,
-              child: AppButton(l.gamesQuizStart,
-                  size: AppButtonSize.lg,
-                  icon: LucideIcons.zap,
-                  onPressed: _start),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -154,70 +180,54 @@ class _QuizScreenState extends State<QuizScreen> {
     final colors = context.colors;
     final q = _kQuestions[_index];
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(
-          Space.gutter, Space.md, Space.gutter, Space.xxl),
+    return Column(
       children: [
-        // Progress + running score.
-        Row(
-          children: [
-            Text('${_index + 1} / $_total',
-                style: AppText.numeric.copyWith(color: colors.textSecondary)),
-            const Spacer(),
-            AppChip('${l.gamesScore}: $_score',
-                variant: AppChipVariant.primary, icon: LucideIcons.target),
-          ],
-        ),
-        const SizedBox(height: Space.sm),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(Radii.chip),
-          child: LinearProgressIndicator(
-            value: (_index + 1) / _total,
-            minHeight: 8,
-            backgroundColor: colors.border,
-            valueColor: AlwaysStoppedAnimation(colors.primary),
-          ),
-        ),
-        const SizedBox(height: Space.lg),
+        _header(context, l,
+            progress: '${l.gamesQuizQuestion} ${_index + 1} / $_total'),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+                Space.gutter, Space.sm, Space.gutter, Space.xxl),
+            children: [
+              // Question stem.
+              Reveal(
+                key: ValueKey('stem-$_index'),
+                index: 0,
+                child: Text(q.stem,
+                    style: AppText.h1
+                        .copyWith(fontSize: 24, color: colors.textPrimary)),
+              ),
+              const SizedBox(height: Space.lg),
 
-        // Question stem.
-        Reveal(
-          key: ValueKey('stem-$_index'),
-          index: 0,
-          child: AppCard(
-            padding: const EdgeInsets.all(Space.lg),
-            child: Text(q.stem,
-                style: AppText.h1.copyWith(color: colors.textPrimary)),
+              // Options.
+              for (var i = 0; i < q.options.length; i++) ...[
+                Reveal(
+                  key: ValueKey('opt-$_index-$i'),
+                  index: i + 1,
+                  child: _OptionTile(
+                    label: q.options[i],
+                    status: _statusFor(i, q.correctIndex),
+                    onTap: _answered ? null : () => _select(i),
+                  ),
+                ),
+                const SizedBox(height: Space.sm),
+              ],
+
+              // Advance — "Keyingi" mid-run, "Natija" on the last question.
+              if (_answered) ...[
+                const SizedBox(height: Space.sm),
+                Reveal(
+                  key: ValueKey('next-$_index'),
+                  child: AppButton(
+                      _isLast ? l.gamesQuizResult : l.gamesQuizNext,
+                      size: AppButtonSize.lg,
+                      icon: _isLast ? LucideIcons.trophy : LucideIcons.arrowRight,
+                      onPressed: _next),
+                ),
+              ],
+            ],
           ),
         ),
-        const SizedBox(height: Space.lg),
-
-        // Options.
-        for (var i = 0; i < q.options.length; i++) ...[
-          Reveal(
-            key: ValueKey('opt-$_index-$i'),
-            index: i + 1,
-            child: _OptionTile(
-              letter: String.fromCharCode(65 + i), // A, B, C, D
-              label: q.options[i],
-              status: _statusFor(i, q.correctIndex),
-              onTap: _answered ? null : () => _select(i),
-            ),
-          ),
-          const SizedBox(height: Space.sm),
-        ],
-
-        // Advance.
-        if (_answered) ...[
-          const SizedBox(height: Space.sm),
-          Reveal(
-            key: ValueKey('next-$_index'),
-            child: AppButton(l.gamesQuizNext,
-                size: AppButtonSize.lg,
-                icon: LucideIcons.arrowRight,
-                onPressed: _next),
-          ),
-        ],
       ],
     );
   }
@@ -233,35 +243,56 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Widget _result(BuildContext context, AppL10n l) {
     final colors = context.colors;
+    // Verdict is inline demo copy (like the question content) — a friendly line,
+    // not a graded label.
+    final verdict = _score >= 8
+        ? 'Ajoyib natija!'
+        : _score >= 4
+            ? 'Yaxshi ish!'
+            : 'Yana urinib koʻring';
+
     return Padding(
       padding: const EdgeInsets.all(Space.gutter),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Gradient trophy tile — the reward moment.
             Reveal(
-                index: 0,
-                child: const IconTile(LucideIcons.partyPopper,
-                    color: AppAccents.amber, size: 96)),
+              index: 0,
+              child: Container(
+                width: 98,
+                height: 98,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: AppGradients.primary,
+                  borderRadius: BorderRadius.circular(Radii.card),
+                  boxShadow: Shadows.lift,
+                ),
+                child: const Icon(LucideIcons.trophy,
+                    color: Colors.white, size: 46),
+              ),
+            ),
             const SizedBox(height: Space.lg),
             Reveal(
               index: 1,
-              child: Text(l.gamesQuizResult,
+              child: Text(verdict,
                   textAlign: TextAlign.center,
                   style: AppText.h1.copyWith(color: colors.textPrimary)),
             ),
-            const SizedBox(height: Space.md),
+            const SizedBox(height: Space.sm),
             Reveal(
               index: 2,
-              child: Text('$_score / $_total',
-                  style: AppText.display
-                      .copyWith(color: colors.primary, fontSize: 44)),
+              child: Text(l.gamesQuizResult,
+                  textAlign: TextAlign.center,
+                  style: AppText.bodySm.copyWith(color: colors.textSecondary)),
             ),
             const SizedBox(height: Space.xs),
             Reveal(
               index: 3,
-              child: Text(l.gamesScore,
-                  style: AppText.bodySm.copyWith(color: colors.textSecondary)),
+              child: Text('$_score / $_total',
+                  style: AppText.numeric
+                      .copyWith(fontSize: 46, color: colors.primary)),
             ),
             const SizedBox(height: Space.xl),
             Reveal(
@@ -271,7 +302,47 @@ class _QuizScreenState extends State<QuizScreen> {
                   icon: LucideIcons.rotateCcw,
                   onPressed: _start),
             ),
+            const SizedBox(height: Space.sm),
+            Reveal(
+              index: 5,
+              child: AppButton(l.gamesQuizClose,
+                  size: AppButtonSize.lg,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: _close),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A small rounded close (X) control — surface fill, hairline border, bouncy tap.
+class _CloseButton extends StatelessWidget {
+  const _CloseButton({required this.onTap, required this.label});
+
+  final VoidCallback onTap;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Semantics(
+      button: true,
+      label: label,
+      child: TapScale(
+        onTap: onTap,
+        child: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(Radii.control),
+            border:
+                Border.all(color: colors.borderStrong, width: Stroke.hairline),
+          ),
+          child: Icon(LucideIcons.x, size: 20, color: colors.textSecondary),
         ),
       ),
     );
@@ -281,17 +352,16 @@ class _QuizScreenState extends State<QuizScreen> {
 /// Visual state of an option tile after (or before) the answer is locked.
 enum _OptStatus { idle, correct, wrong, muted }
 
-/// A big, tappable answer tile with a lettered badge. On lock it flashes green
-/// (correct) or red (the wrong choice); untouched options fade back.
+/// A full-width answer button. Rests on surface + a strong hairline; on lock the
+/// correct choice fills solid green (white text) and a wrong pick fills red, both
+/// over a 220 ms colour tween. Untouched options fade back to 55%.
 class _OptionTile extends StatelessWidget {
   const _OptionTile({
-    required this.letter,
     required this.label,
     required this.status,
     required this.onTap,
   });
 
-  final String letter;
   final String label;
   final _OptStatus status;
   final VoidCallback? onTap;
@@ -299,81 +369,84 @@ class _OptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    // Deliberate 220 ms colour transition (design handoff); honours reduce-motion.
+    final dur = motionOf(context, const Duration(milliseconds: 220));
 
     final (Color bg, Color border, Color fg, IconData? trailing) =
         switch (status) {
       _OptStatus.idle => (
           colors.surface,
-          colors.border,
+          colors.borderStrong,
           colors.textPrimary,
-          null
+          null,
         ),
       _OptStatus.correct => (
           colors.success,
           colors.success,
           colors.textOnPrimary,
-          LucideIcons.check
+          LucideIcons.check,
         ),
       _OptStatus.wrong => (
           colors.danger,
           colors.danger,
           colors.textOnPrimary,
-          LucideIcons.x
+          LucideIcons.x,
         ),
+      // Muted keeps the resting look; the enclosing opacity recedes it.
       _OptStatus.muted => (
           colors.surface,
-          colors.border,
-          colors.textTertiary,
-          null
+          colors.borderStrong,
+          colors.textPrimary,
+          null,
         ),
     };
 
-    final filled = status == _OptStatus.correct || status == _OptStatus.wrong;
-
     final tile = AnimatedContainer(
-      duration: motionOf(context, Motion.fast),
-      curve: Motion.enter,
-      padding: const EdgeInsets.all(Space.md),
+      duration: dur,
+      curve: Motion.standard,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+          horizontal: Space.md, vertical: Space.md),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(Radii.card),
+        borderRadius: BorderRadius.circular(Radii.control),
         border: Border.all(color: border, width: Stroke.hairline),
-        boxShadow: status == _OptStatus.idle ? Shadows.card : null,
       ),
       child: Row(
         children: [
-          // Lettered badge (hidden once the tile is filled — the icon takes over).
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: filled
-                  ? colors.textOnPrimary.withValues(alpha: 0.22)
-                  : colors.primarySubtle,
-              borderRadius: BorderRadius.circular(Radii.chip),
-            ),
-            child: Text(letter,
-                style: AppText.label
-                    .copyWith(color: filled ? colors.textOnPrimary : colors.primary)),
-          ),
-          const SizedBox(width: Space.md),
           Expanded(
-            child: Text(label,
-                style: AppText.bodyStrong.copyWith(color: fg)),
+            child: AnimatedDefaultTextStyle(
+              duration: dur,
+              curve: Motion.standard,
+              style: AppText.body.copyWith(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: fg),
+              child: Text(label),
+            ),
           ),
-          if (trailing != null) ...[
-            const SizedBox(width: Space.sm),
-            Icon(trailing, size: 22, color: fg),
-          ],
+          const SizedBox(width: Space.sm),
+          // Reserve the trailing slot so the label never shifts; the tick/cross
+          // fades in only once the answer is locked.
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: AnimatedOpacity(
+              opacity: trailing == null ? 0 : 1,
+              duration: dur,
+              curve: Motion.standard,
+              child: Icon(trailing ?? LucideIcons.check, size: 20, color: fg),
+            ),
+          ),
         ],
       ),
     );
 
-    // Opacity(mute) is compositing-only; keeps untouched options recessive.
-    final content = status == _OptStatus.muted
-        ? Opacity(opacity: 0.55, child: tile)
-        : tile;
+    // AnimatedOpacity(mute) is compositing-only; keeps untouched options recessive.
+    final content = AnimatedOpacity(
+      opacity: status == _OptStatus.muted ? 0.55 : 1,
+      duration: dur,
+      curve: Motion.standard,
+      child: tile,
+    );
 
     return TapScale(onTap: onTap, child: content);
   }

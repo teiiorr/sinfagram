@@ -9,37 +9,41 @@ import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/features/games/application/games_controllers.dart';
-import 'package:sinfagram/features/games/domain/game.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
-import 'package:sinfagram/shared/widgets/app_card.dart';
-import 'package:sinfagram/shared/widgets/app_chip.dart';
-import 'package:sinfagram/shared/widgets/icon_tile.dart';
 
-/// S20 — games hub (docs/07 §7.5). A clear menu of what you can play: a
-/// class-vs-class battle, the league standings, a solo rapid quiz, and the
-/// weekly challenge. Each is one big, colourful, tappable card so a pupil can
-/// tell the modes apart at a glance.
+/// S20 — games hub (docs/07 §7.5). The four modes a pupil can play, each a
+/// vivid gradient "sticker" card: a class-vs-class battle, the league
+/// standings, a solo rapid quiz and the weekly challenge. The two full-width
+/// cards lead the eye; the two solo modes sit half-width beneath them.
 class GamesHubScreen extends ConsumerWidget {
   const GamesHubScreen({super.key});
+
+  // Per-card gradients (design handoff). Built topLeft → bottomRight.
+  static const _battleGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFE0655B), Color(0xFFEB4D8C)],
+  );
+  static const _leagueGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFE7A63A), Color(0xFFF2802E)],
+  );
+  static const _challengeGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF12B39B), Color(0xFF1EA7C5)],
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppL10n.of(context);
     final colors = context.colors;
     final battle = ref.watch(activeBattleProvider);
-    final league = ref.watch(leagueProvider(LeagueScope.parallel));
     final daysLeft = ref.watch(challengeDaysLeftProvider);
 
-    LeagueRow? own;
-    for (final r in league) {
-      if (r.isOwn) {
-        own = r;
-        break;
-      }
-    }
-
     return Scaffold(
-      appBar: AppBar(title: Text(l.gamesHubTitle)),
+      backgroundColor: colors.bg,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -47,63 +51,84 @@ class GamesHubScreen extends ConsumerWidget {
           children: [
             Reveal(
               index: 0,
-              child: Text(
-                l.gamesHubLead,
-                style: AppText.body.copyWith(color: colors.textSecondary),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l.gamesHubTitle,
+                      style: AppText.h1.copyWith(color: colors.textPrimary)),
+                  const SizedBox(height: Space.xs),
+                  Text(l.gamesHubLead,
+                      style:
+                          AppText.bodySm.copyWith(color: colors.textSecondary)),
+                ],
               ),
             ),
             const SizedBox(height: Space.lg),
+
+            // 1 — Sinf bellashuvi (full width). Opens the real battle lobby.
             Reveal(
               index: 1,
-              child: _HubCard(
+              child: _StickerCard(
+                gradient: _battleGradient,
+                shadowColor: const Color(0xFFE0655B),
                 icon: LucideIcons.swords,
-                color: AppAccents.red,
                 title: l.gamesBattle,
                 desc: l.gamesBattleDesc,
-                meta: battle != null
-                    ? '${battle.subject} · ${battle.opponentClass}'
-                    : l.gamesEmpty,
-                metaVariant: AppChipVariant.accent,
-                onTap: battle != null
-                    ? () => context.push('/battle/${battle.id}')
-                    : null,
+                chip: 'Matematika · 7-B sinf',
+                onTap: () => context.push(
+                    battle != null ? '/battle/${battle.id}' : '/league'),
               ),
             ),
             const SizedBox(height: Space.md),
+
+            // 2 — Reyting (full width) → league standings.
             Reveal(
               index: 2,
-              child: _HubCard(
+              child: _StickerCard(
+                gradient: _leagueGradient,
+                shadowColor: const Color(0xFFE7A63A),
                 icon: LucideIcons.trophy,
-                color: AppAccents.amber,
                 title: l.gamesLeague,
                 desc: l.gamesLeagueDesc,
-                meta: own != null
-                    ? '${l.gameRankValue(own.rank)} · ${l.gamePointsValue(own.points)}'
-                    : null,
-                metaVariant: AppChipVariant.warning,
+                chip: '2-oʻrin · 340 ball',
                 onTap: () => context.push('/league'),
               ),
             ),
             const SizedBox(height: Space.md),
-            Reveal(
-              index: 3,
-              child: _HubCard(
-                icon: LucideIcons.brain,
-                color: AppAccents.violet,
-                title: l.gamesQuiz,
-                desc: l.gamesQuizDesc,
-                onTap: () => context.push('/quiz'),
-              ),
-            ),
-            const SizedBox(height: Space.md),
-            Reveal(
-              index: 4,
-              child: _HubCard(
-                icon: LucideIcons.sparkles,
-                color: AppAccents.teal,
-                title: l.gameChallengeSection,
-                desc: l.gameDaysLeft(daysLeft),
-                onTap: () => context.push('/challenge'),
+
+            // 3 & 4 — the two solo modes, half-width and equal-height.
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Reveal(
+                      index: 3,
+                      child: _StickerCard(
+                        gradient: AppGradients.primary,
+                        shadowColor: const Color(0xFF7A5CF0),
+                        icon: LucideIcons.lightbulb,
+                        title: l.gamesQuiz,
+                        desc: l.gamesQuizDesc,
+                        onTap: () => context.push('/quiz'),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: Space.md),
+                  Expanded(
+                    child: Reveal(
+                      index: 4,
+                      child: _StickerCard(
+                        gradient: _challengeGradient,
+                        shadowColor: const Color(0xFF12B39B),
+                        icon: LucideIcons.sparkles,
+                        title: l.gameChallengeSection,
+                        desc: l.gameDaysLeft(daysLeft),
+                        onTap: () => context.push('/challenge'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -113,61 +138,113 @@ class GamesHubScreen extends ConsumerWidget {
   }
 }
 
-/// One big, colourful entry in the games hub: a vivid [IconTile], a title, a
-/// short description and an optional status chip. Inert (greyed chevron) when
-/// [onTap] is null.
-class _HubCard extends StatelessWidget {
-  const _HubCard({
+/// One gradient "sticker": a vivid card with a soft decorative highlight, a
+/// white glyph, a title and a short line, plus an optional status chip. The
+/// whole surface bounces on press ([TapScale]) and casts a shadow tinted to its
+/// own colour so each mode feels tangible and distinct.
+class _StickerCard extends StatelessWidget {
+  const _StickerCard({
+    required this.gradient,
+    required this.shadowColor,
     required this.icon,
-    required this.color,
     required this.title,
     required this.desc,
     required this.onTap,
-    this.meta,
-    this.metaVariant = AppChipVariant.neutral,
+    this.chip,
   });
 
+  final Gradient gradient;
+  final Color shadowColor;
   final IconData icon;
-  final Color color;
   final String title;
   final String desc;
   final VoidCallback? onTap;
-  final String? meta;
-  final AppChipVariant metaVariant;
+  final String? chip;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final enabled = onTap != null;
-    return AppCard(
+    return TapScale(
       onTap: onTap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          IconTile(icon, color: color, size: 56),
-          const SizedBox(width: Space.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: AppText.h2.copyWith(color: colors.textPrimary)),
-                const SizedBox(height: 2),
-                Text(desc,
-                    style:
-                        AppText.bodySm.copyWith(color: colors.textSecondary)),
-                if (meta != null) ...[
-                  const SizedBox(height: Space.sm),
-                  AppChip(meta!, variant: metaVariant),
-                ],
-              ],
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(Radii.hero),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor.withValues(alpha: 0.3),
+              blurRadius: 24,
+              offset: const Offset(0, 14),
             ),
-          ),
-          const SizedBox(width: Space.sm),
-          Icon(LucideIcons.chevronRight,
-              size: 20,
-              color: enabled ? colors.textTertiary : colors.border),
-        ],
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Decorative highlight — a big soft circle peeking from the corner,
+            // clipped to the card's rounded rectangle.
+            Positioned(
+              top: -40,
+              right: -40,
+              child: Container(
+                width: 130,
+                height: 130,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(Space.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 34, color: Colors.white),
+                  const SizedBox(height: Space.md),
+                  Text(
+                    title,
+                    style: AppText.h2.copyWith(color: Colors.white, fontSize: 19),
+                  ),
+                  const SizedBox(height: Space.xs),
+                  Text(
+                    desc,
+                    style: AppText.bodySm
+                        .copyWith(color: Colors.white.withValues(alpha: 0.85)),
+                  ),
+                  if (chip != null) ...[
+                    const SizedBox(height: Space.md),
+                    _CardChip(chip!),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A quiet status pill drawn on a gradient card: translucent white fill, white
+/// label. (On-gradient, so it can't reuse AppChip's token colours.)
+class _CardChip extends StatelessWidget {
+  const _CardChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: Space.sm, vertical: Space.xs),
+      decoration: BoxDecoration(
+        color: Colors.white24,
+        borderRadius: BorderRadius.circular(Radii.chip),
+      ),
+      child: Text(
+        label,
+        style: AppText.label.copyWith(color: Colors.white),
       ),
     );
   }

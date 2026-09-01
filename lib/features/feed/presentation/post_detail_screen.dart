@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:sinfagram/core/async/loadable.dart';
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
+import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/features/feed/application/comments_controller.dart';
@@ -12,6 +13,7 @@ import 'package:sinfagram/features/feed/application/day_page_controller.dart';
 import 'package:sinfagram/features/feed/domain/comment.dart';
 import 'package:sinfagram/features/feed/domain/post.dart';
 import 'package:sinfagram/features/moderation/presentation/report_sheet.dart';
+import 'package:sinfagram/shared/motion/motion_widgets.dart';
 import 'package:sinfagram/shared/widgets/avatar.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
 import 'package:sinfagram/shared/widgets/post_card.dart';
@@ -90,9 +92,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
         ref.watch(commentsProvider)[widget.postId] ?? const <Comment>[];
 
     return Scaffold(
-      appBar: AppBar(
-          title: Text(post.authorName,
-              maxLines: 1, overflow: TextOverflow.ellipsis)),
+      appBar: AppBar(title: Text(l.commentsTitle)),
       body: SafeArea(
         child: Column(
           children: [
@@ -118,10 +118,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                     waitingLabel: l.composeReview,
                   ),
                   const SizedBox(height: Space.lg),
-                  Text(l.commentsTitle,
-                      style: AppText.label.copyWith(
-                          color: colors.textTertiary, letterSpacing: 0.6)),
-                  const SizedBox(height: Space.sm),
                   if (comments.isEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: Space.lg),
@@ -130,7 +126,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                               .copyWith(color: colors.textSecondary)),
                     )
                   else
-                    for (final c in comments) _CommentRow(c),
+                    for (var i = 0; i < comments.length; i++)
+                      Reveal(index: i, child: _CommentRow(comments[i])),
                 ],
               ),
             ),
@@ -141,6 +138,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
+  /// Pinned bottom composer: a soft pill input on the page ground and a circular
+  /// gradient send button. The button carries the brand gradient once there is
+  /// text to send, and drops to a flat recessive fill while empty.
   Widget _composer(BuildContext context, AppL10n l, AppColors colors) {
     return Container(
       decoration: BoxDecoration(
@@ -149,32 +149,62 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             top: BorderSide(color: colors.border, width: Stroke.hairline)),
       ),
       padding:
-          const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.sm, Space.sm),
+          const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, Space.sm),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: TextField(
-              controller: _controller,
-              minLines: 1,
-              maxLines: 4,
-              textCapitalization: TextCapitalization.sentences,
-              style: AppText.body.copyWith(color: colors.textPrimary),
-              decoration: InputDecoration(
-                isDense: true,
-                border: InputBorder.none,
-                hintText: l.commentHint,
-                hintStyle: AppText.body.copyWith(color: colors.textTertiary),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Space.md, vertical: Space.sm),
+              decoration: BoxDecoration(
+                color: colors.bg,
+                borderRadius: BorderRadius.circular(22),
               ),
-              onSubmitted: (_) => _canSend ? _send() : null,
+              child: TextField(
+                controller: _controller,
+                minLines: 1,
+                maxLines: 4,
+                textCapitalization: TextCapitalization.sentences,
+                cursorColor: colors.primary,
+                style: AppText.body.copyWith(color: colors.textPrimary),
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                  hintText: l.commentHint,
+                  hintStyle:
+                      AppText.body.copyWith(color: colors.textTertiary),
+                ),
+                onSubmitted: (_) {
+                  if (_canSend) _send();
+                },
+              ),
             ),
           ),
-          IconButton(
-            onPressed: _canSend ? _send : null,
-            tooltip: l.actionSend,
-            icon: Icon(LucideIcons.send,
-                size: 20,
-                color: _canSend ? colors.primary : colors.textTertiary),
+          const SizedBox(width: Space.sm),
+          Semantics(
+            button: true,
+            enabled: _canSend,
+            label: l.actionSend,
+            child: TapScale(
+              onTap: _canSend ? _send : null,
+              child: Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: _canSend ? AppGradients.primary : null,
+                  color: _canSend ? null : colors.border,
+                  boxShadow: _canSend ? Shadows.card : null,
+                ),
+                child: Icon(
+                  LucideIcons.send,
+                  size: 20,
+                  color: _canSend ? colors.textOnPrimary : colors.textTertiary,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -195,7 +225,7 @@ class _CommentRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Avatar(name: comment.author, size: 32),
+          Avatar(name: comment.author, size: 38),
           const SizedBox(width: Space.sm),
           Expanded(
             child: Column(

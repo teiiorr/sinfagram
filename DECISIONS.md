@@ -103,3 +103,37 @@ Key rules kept from the product owner's own answers:
 Posts split by `Post.hasMedia`; new derived providers `feedPhotoPostsProvider`,
 `munozaraPostsProvider`, `repostedPostsProvider`. All still count-less and
 privacy-preserving; all motion compositing-only + reduce-motion.
+
+## D-10 — "Play" visual redesign from Claude Design handoff (2026-09-01)
+
+**Source.** Product owner supplied a Claude Design handoff ("Sinfagram — Play
+mobile redesign", `Sinfagram Play.dc.html` + README) — a high-fidelity spec with
+exact tokens. Applied to the pupil app.
+
+**Foundation changes (lib/core/theme + shared):**
+- **Fonts** — replaced Inter on pupil surfaces with **Baloo 2** (display/titles/
+  scores/initials) + **Fredoka** (body/labels). Bundled variable fonts in
+  `fonts/baloo2` + `fonts/fredoka` (OFL, from google/fonts); default family set
+  in `app_theme` (Fredoka base merged under Baloo 2 slots). This is the single
+  biggest driver of the playful feel (Inter read as institutional).
+- **Palette** — exact handoff tokens: soft lavender `bg #F3EFFF` (never stark
+  white), violet `primary #6A4CE6`, warm semantics; full dark set.
+- **Shadows** — signature **violet-tinted glow** (not neutral grey) on cards /
+  nav / lifts.
+- **Radii** — bigger & softer: cards 26, nav 28, hero 24, chip 10, control 15,
+  FAB 20, feed header bottom 42.
+- **Gradients** — feed hero, avatar ring, battle, league, static conic story
+  ring; `AppGradients.of()` now accent→darker-35%.
+- **Motion** — playful overshoot entrance `cubic(.2,.9,.28,1.3)` (Reveal, 560ms,
+  65ms stagger) + bouncy press squish `cubic(.34,1.56,.64,1)` (TapScale, nav
+  blob). All compositing-only + reduce-motion.
+- **Nav** — floating rounded bar + sliding `primarySubtle` blob + gradient
+  rounded-square create FAB.
+
+**Two product tweaks (this session):** feed carries the **school-board slide
+only** (friends carousel removed on request); **story rings do not spin** (static
+conic ring; viewer auto-advance kept).
+
+All D-07/D-08/D-09 product constraints preserved: count-less, private "Rahmat",
+double-tap only adds, anonymous reports, no DMs, no AI/real imagery of minors.
+`Sinfagram.dc.html` (earlier flatter iteration) was superseded per the handoff.

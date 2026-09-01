@@ -11,6 +11,7 @@ import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/features/people/application/people_controllers.dart';
 import 'package:sinfagram/features/people/domain/person.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
+import 'package:sinfagram/shared/widgets/app_card.dart';
 import 'package:sinfagram/shared/widgets/avatar.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
 
@@ -42,16 +43,15 @@ class ClassmatesScreen extends ConsumerWidget {
                   Space.gutter,
                   Space.lg,
                   Space.gutter,
-                  Space.lg,
+                  Space.xl,
                 ),
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
                   mainAxisSpacing: Space.md,
                   crossAxisSpacing: Space.md,
-                  // Tuned so the ring-avatar plus a name and reading line fit
-                  // comfortably in one cell.
-                  childAspectRatio: 0.74,
+                  // Roomy, near-square cards: the ringed avatar sits centred with
+                  // the name below, with slack for a 1.6x text scale.
+                  childAspectRatio: 0.85,
                 ),
                 itemCount: people.length,
                 itemBuilder: (context, i) => Reveal(
@@ -64,9 +64,9 @@ class ClassmatesScreen extends ConsumerWidget {
   }
 }
 
-/// One face in the grid: a gradient-ringed avatar over the name (and what the
-/// person is reading, when they've shared it). The whole cell is the tap target
-/// and springs on press before routing to the profile.
+/// One face in the grid: a gradient-ringed avatar over the centred name, on a
+/// soft card. The whole cell springs on press (bouncy [TapScale]) before routing
+/// to the profile.
 class _ClassmateCell extends StatelessWidget {
   const _ClassmateCell({required this.person});
 
@@ -75,48 +75,41 @@ class _ClassmateCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    // A stable per-person hue so the same face keeps its colour everywhere.
-    final seed = AppAccents.forSeed(person.name);
 
     return TapScale(
       onTap: () => context.push('/person/${person.id}'),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Vivid gradient ring → surface gap → initials avatar.
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              gradient: AppGradients.of(seed),
-              shape: BoxShape.circle,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: colors.surface,
+      child: AppCard(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Brand ring → surface inset → initials avatar.
+            Container(
+              padding: const EdgeInsets.all(2.5),
+              decoration: const BoxDecoration(
+                gradient: AppGradients.avatarRing,
                 shape: BoxShape.circle,
               ),
-              child: Avatar(name: person.name, size: 54),
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  shape: BoxShape.circle,
+                ),
+                child: Avatar(name: person.name, size: 60),
+              ),
             ),
-          ),
-          const SizedBox(height: Space.sm),
-          Text(
-            person.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: AppText.caption.copyWith(color: colors.textPrimary),
-          ),
-          if (person.reading.isNotEmpty)
+            const SizedBox(height: Space.sm),
             Text(
-              person.reading,
-              maxLines: 1,
+              person.name,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: AppText.caption.copyWith(color: colors.textTertiary),
+              style: AppText.bodyStrong
+                  .copyWith(color: colors.textPrimary, fontSize: 13.5),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

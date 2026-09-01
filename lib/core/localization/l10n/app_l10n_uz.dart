@@ -1060,6 +1060,12 @@ class AppL10nUz extends AppL10n {
 
   @override
   String get boardClassHub => 'Sinf faoliyati';
+
+  @override
+  String get gamesQuizClose => 'Yopish';
+
+  @override
+  String get gamesQuizQuestion => 'Savol';
 }
 
 /// The translations for Uzbek, using the Cyrillic script (`uz_Cyrl`).
@@ -2117,4 +2123,10 @@ class AppL10nUzCyrl extends AppL10nUz {
 
   @override
   String get boardClassHub => 'Синф фаолияти';
+
+  @override
+  String get gamesQuizClose => 'Ёпиш';
+
+  @override
+  String get gamesQuizQuestion => 'Савол';
 }

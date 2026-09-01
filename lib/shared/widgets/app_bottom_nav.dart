@@ -14,14 +14,15 @@ class AppNavItem {
   final IconData icon;
   final String label;
 
-  /// An action item (e.g. the centre "Create" button) renders as a prominent
-  /// filled circle and never shows the sliding selection pill.
+  /// An action item (the centre "Create" FAB) renders as a prominent gradient
+  /// rounded-square and never shows the sliding selection blob.
   final bool isAction;
 }
 
-/// Shared bottom navigation with an animated indicator pill that slides between
-/// tabs and an icon that scales on selection (DECISIONS.md — elevated motion).
-/// Labels always visible; a single dot (never a number) marks [dotIndex].
+/// Floating bottom navigation ("Play" redesign): a rounded, elevated bar that
+/// floats above the content, an animated `primarySubtle` blob that slides
+/// between tabs, and a gradient rounded-square create FAB. Labels always
+/// visible; a single dot (never a number) marks [dotIndex].
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     super.key,
@@ -39,34 +40,39 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return RepaintBoundary(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.surface,
-          border: Border(
-              top: BorderSide(color: colors.border, width: Stroke.hairline)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 60,
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
+        child: RepaintBoundary(
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(Radii.nav),
+              border:
+                  Border.all(color: colors.border, width: Stroke.hairline),
+              boxShadow: Shadows.soft,
+            ),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final itemWidth = constraints.maxWidth / items.length;
+                const inset = 10.0;
                 return Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    // Sliding indicator pill behind the active item.
+                    // Sliding blob behind the active tab.
                     AnimatedPositioned(
-                      duration: motionOf(context, Motion.base),
-                      curve: Motion.emphasize,
-                      left: itemWidth * currentIndex + Space.md,
-                      top: 8,
-                      width: itemWidth - Space.md * 2,
-                      height: 44,
+                      duration: motionOf(context, Motion.slow),
+                      curve: Motion.spring,
+                      left: itemWidth * currentIndex + inset,
+                      top: 9,
+                      width: itemWidth - inset * 2,
+                      height: 46,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           color: colors.primarySubtle,
-                          borderRadius: BorderRadius.circular(Radii.control),
+                          borderRadius: BorderRadius.circular(17),
                         ),
                       ),
                     ),
@@ -113,33 +119,32 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    // The centre "Create" action: a prominent filled primary circle.
+    // The centre "Create" FAB: a gradient rounded-square, tilted, glowing.
     if (item.isAction) {
       return Semantics(
         button: true,
         label: item.label,
-        child: InkResponse(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          radius: 28,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 42,
-                height: 42,
+          child: Center(
+            child: Transform.rotate(
+              angle: -0.105, // ~ -6°
+              child: Container(
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
                   gradient: AppGradients.primary,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(Radii.fab),
                   boxShadow: Shadows.lift,
                 ),
-                child: const Icon(LucideIcons.plus, size: 24, color: Colors.white),
+                child: Transform.rotate(
+                  angle: 0.105,
+                  child: const Icon(LucideIcons.plus,
+                      size: 26, color: Colors.white),
+                ),
               ),
-              const SizedBox(height: 3),
-              Text(item.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppText.label.copyWith(color: colors.textSecondary)),
-            ],
+            ),
           ),
         ),
       );
@@ -152,7 +157,7 @@ class _NavItem extends StatelessWidget {
       label: item.label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(Radii.control),
+        borderRadius: BorderRadius.circular(17),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -163,7 +168,7 @@ class _NavItem extends StatelessWidget {
                   scale: selected ? 1.15 : 1.0,
                   duration: motionOf(context, Motion.base),
                   curve: Motion.spring,
-                  child: Icon(item.icon, size: 26, color: color),
+                  child: Icon(item.icon, size: 24, color: color),
                 ),
                 if (dot)
                   Positioned(
@@ -185,8 +190,9 @@ class _NavItem extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: motionOf(context, Motion.fast),
               style: AppText.label.copyWith(
+                  fontSize: 10.5,
                   color: color,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500),
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600),
               child: Text(item.label,
                   maxLines: 1, overflow: TextOverflow.ellipsis),
             ),

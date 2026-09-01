@@ -29,7 +29,11 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: c.bg,
       canvasColor: c.surface,
       extensions: [c],
-      textTheme: _textTheme(c.textPrimary),
+      // Fredoka is the default family for any unstyled Material slot; the
+      // explicit AppText slots (some Baloo 2) are merged on top and win.
+      textTheme: ThemeData(brightness: brightness, fontFamily: 'Fredoka')
+          .textTheme
+          .merge(_textTheme(c.textPrimary)),
       appBarTheme: AppBarTheme(
         toolbarHeight: 52,
         backgroundColor: c.surface,
