@@ -1,0 +1,27 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "sinfagram-a1e51",
+          "appId": "1:295563657910:android:9cb207127352eeeeeadc17",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "sinfagram-a1e51",
+          "configurations": {
+            "android": "1:295563657910:android:9cb207127352eeeeeadc17"
+          }
+        }
+      }
+    }
+  }
+}

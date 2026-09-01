@@ -1,0 +1,479 @@
+{
+  "@@locale": "uz",
+  "appTitle": "Sinfagram",
+  "@appTitle": {
+    "description": "Application name"
+  },
+  "actionContinue": "Davom etish",
+  "actionRetry": "Qayta urinish",
+  "actionSend": "Yuborish",
+  "actionCancel": "Bekor qilish",
+  "actionEdit": "Tahrirlash",
+  "actionUnderstood": "Tushundim",
+  "navClass": "Sinf",
+  "navGames": "Oʻyin",
+  "navChronicle": "Solnoma",
+  "navMe": "Men",
+  "emptyTitle": "Hozircha boʻsh",
+  "emptyBody": "Bu yerda hali maʼlumot yoʻq.",
+  "errorTitle": "Xatolik yuz berdi",
+  "errorBody": "Qayta urinib koʻring.",
+  "bannerOffline": "Oflayn — koʻrsatilayotgan maʼlumot eski boʻlishi mumkin",
+  "localeTitle": "Til va yozuv",
+  "localeUzLatn": "Oʻzbekcha (lotin)",
+  "localeUzCyrl": "Ўзбекча (кирилл)",
+  "localeRu": "Русский",
+  "localeKaa": "Qaraqalpaqsha",
+  "roleTitle": "Kim sifatida kirasiz?",
+  "rolePupil": "Men oʻquvchiman",
+  "rolePupilSub": "Sinf kodi bilan oʻz sinfingizga kirasiz.",
+  "roleTeacher": "Men oʻqituvchiman",
+  "roleTeacherSub": "Sinf yaratasiz va roʻyxatni tasdiqlaysiz.",
+  "roleParent": "Men ota-onaman",
+  "roleParentSub": "Farzandingiz faoliyatini kuzatasiz.",
+  "codeTitle": "Oʻqituvchingiz bergan kodni kiriting",
+  "codeHelp": "Kod yoʻqmi? Sinf rahbaringizga murojaat qiling.",
+  "codeError": "Kod notoʻgʻri. Qayta tekshiring.",
+  "rosterTitle": "Ismingizni tanlang",
+  "rosterSearch": "Qidirish",
+  "rosterConfirmTitle": "Bu sizmisiz?",
+  "pinTitle": "PIN kod oʻrnating",
+  "pinRepeat": "PIN kodni takrorlang",
+  "pinHint": "Bu PIN faqat shu qurilma uchun.",
+  "pinMismatch": "PIN kodlar mos kelmadi.",
+  "consentTitle": "Ota-ona tasdigʻi kutilmoqda",
+  "consentBody": "Ota-onangiz roziligini bergach, sinfga kira olasiz.",
+  "consentResend": "Soʻrovni qayta yuborish",
+  "visibilityTitle": "Ota-onangiz nimani koʻradi",
+  "visibilitySees": "Ota-onangiz koʻradi",
+  "visibilitySeesItems": "Siz eʼlon qilgan postlar\nFaollik kunlari va vaqti\nSinfdagi shikoyatlar natijasi",
+  "visibilityNotSees": "Ota-onangiz koʻrmaydi",
+  "visibilityNotItems": "Shaxsiy xabarlaringiz (ular umuman yoʻq)\nKimga rahmat berganingiz\nQaysi postlarni oʻqiganingiz",
+  "dayComposerEntry": "Nima boʻldi bugun?",
+  "dayComplete": "Bugungisi tugadi",
+  "dayCompleteSub": "Ertaga yana koʻrishamiz.",
+  "dayPrevious": "Kechagi kunni koʻrish",
+  "dayEmpty": "Bugun hali hech narsa yoʻq. Birinchi boʻlishingiz mumkin.",
+  "thanks": "Rahmat",
+  "report": "Shikoyat",
+  "comments": "{count, plural, =0{Izoh yoʻq} other{Izoh {count}}}",
+  "@comments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "composeTitle": "Yangi post",
+  "composeHint": "Nima boʻldi bugun?",
+  "composePost": "Joylash",
+  "composePhoto": "Rasm qoʻshish",
+  "composeReview": "Bu post koʻrib chiqilmoqda",
+  "meThanksTitle": "Sizning rahmatlaringiz",
+  "meThanksPrivate": "Buni faqat siz va ota-onangiz koʻradi.",
+  "meTimeToday": "Bugun ilovada",
+  "meSettings": "Sozlamalar",
+  "meAbout": "Ilova haqida",
+  "meSignOut": "Chiqish",
+  "gamesTitle": "Oʻyin",
+  "gamesEmpty": "Hozircha bellashuv yoʻq. Keyingisi tez orada.",
+  "chronicleTitle": "Sinf solnomasi",
+  "chronicleEmpty": "Birinchi bob shu oyda yigʻiladi.",
+  "boardTitle": "Maktab taxtasi",
+  "settingsTitle": "Sozlamalar",
+  "settingsLanguage": "Til va yozuv",
+  "settingsDarkMode": "Tungi tema",
+  "settingsSignOut": "Chiqish",
+  "aboutTitle": "Ilova haqida",
+  "aboutVersion": "Versiya",
+  "aboutMinistry": "Maktabgacha va maktab taʼlimi vazirligi",
+  "chalkTitle": "Bugun sinfda",
+  "chalkNote": "Bilim — kelajak kaliti",
+  "storyYou": "Siz",
+  "storyAdd": "Hikoya qoʻshish",
+  "storyAdded": "Hikoyangiz qoʻshildi",
+  "feedFriendsNow": "Doʻstlar nima yozdi",
+  "meReading": "Hozir oʻqiyapman",
+  "meListening": "Hozir tinglayapman",
+  "meInterests": "Qiziqishlar",
+  "meBio": "Men haqimda",
+  "meEditProfile": "Profilni tahrirlash",
+  "meEditSaved": "Profil saqlandi",
+  "commentsTitle": "Izohlar",
+  "commentHint": "Izoh yozing...",
+  "commentEmpty": "Hali izoh yoʻq. Birinchi boʻling.",
+  "helpTitle": "Yordam taxtasi",
+  "helpFilterAll": "Barchasi",
+  "helpFilterWaiting": "Javob kutmoqda",
+  "helpFilterClosed": "Yopilgan",
+  "helpAsk": "Savol berish",
+  "helpEmpty": "Hali savol yoʻq. Birinchi boʻlib soʻrang.",
+  "helpAnswers": "{count, plural, =0{Javob yoʻq} other{{count} ta javob}}",
+  "@helpAnswers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "helpBest": "Eng yaxshi javob",
+  "helpMarkBest": "Eng yaxshi deb belgilash",
+  "helpAnswerHint": "Javobingiz...",
+  "helpAnswerMin": "Kamida 40 belgi kerak",
+  "helpAskTitle": "Savol berish",
+  "helpQuestionHint": "Savolingizni yozing",
+  "helpSubject": "Fan",
+  "boardSchedule": "Dars jadvali",
+  "boardHomework": "Uy vazifasi",
+  "boardAnnouncements": "Eʼlonlar",
+  "boardLostFound": "Yoʻqolgan buyumlar",
+  "boardNow": "Hozir",
+  "reportTitle": "Shikoyat",
+  "reportReasonBullying": "Bulling / kamsitish",
+  "reportReasonOffensive": "Ogʻzaki haqorat",
+  "reportReasonSpam": "Spam / reklama",
+  "reportReasonOther": "Boshqa",
+  "reportNoteHint": "Izoh (ixtiyoriy)",
+  "reportWhoSees": "Buni faqat sinf rahbaringiz koʻradi. Kim shikoyat qilgani oshkor etilmaydi.",
+  "reportSent": "Shikoyatingiz yuborildi",
+  "gameActiveBattle": "Faol bellashuv",
+  "gameOpponent": "Raqib",
+  "gameSubject": "Fan",
+  "gameStart": "Boshlash",
+  "gameCannotPause": "Boshlangach, toʻxtatib boʻlmaydi.",
+  "gamePlayed": "{count, plural, =0{Hali hech kim qatnashmadi} other{{count} oʻquvchi qatnashdi}}",
+  "@gamePlayed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gameLeagueSection": "Liga",
+  "gameRankValue": "{count}-oʻrin",
+  "@gameRankValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gamePointsValue": "{count} ball",
+  "@gamePointsValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gameChallengeSection": "Haftalik chaqiriq",
+  "gameDaysLeft": "{count, plural, other{{count} kun qoldi}}",
+  "@gameDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "battleResultTitle": "Natija",
+  "battleYourClass": "Sizning sinfingiz",
+  "battleOpponentClass": "Raqib sinf",
+  "battleParticipation": "Qatnashuv",
+  "battlePerSubject": "Fanlar boʻyicha",
+  "battleWin": "Gʻalaba!",
+  "battleLose": "Bu safar boʻlmadi",
+  "battleDraw": "Durrang",
+  "battleNoPupilScore": "Ball butun sinfniki — shaxsiy natija koʻrsatilmaydi.",
+  "leagueTitle": "Liga",
+  "leagueParallel": "Parallel",
+  "leagueSchool": "Maktab",
+  "leagueDistrict": "Tuman",
+  "leagueRegion": "Viloyat",
+  "leagueColClass": "Sinf",
+  "leagueColPlayed": "Oʻyinlar",
+  "leagueColPoints": "Ball",
+  "leagueEmpty": "Mavsum hali boshlanmadi",
+  "chronicleSealed": "Muhrlangan",
+  "chronicleItems": "{count, plural, =0{Element yoʻq} other{{count} ta element}}",
+  "@chronicleItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chronicleDaysToSeal": "{count, plural, other{{count} kundan soʻng muhrlanadi}}",
+  "@chronicleDaysToSeal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chapterSealedNote": "Bu bob muhrlangan — faqat koʻrish uchun.",
+  "chapterEmpty": "Bu bobda hali element yoʻq.",
+  "nightTitle": "Tungi rejim",
+  "nightBody": "Sinf tunda dam oladi. Ertalab {time} da yana ochiladi.",
+  "@nightBody": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nightToBoard": "Maktab taxtasiga oʻtish",
+  "lessonTitle": "Dars rejimi",
+  "lessonBody": "Hozir dars vaqti. Dars {time} da tugaydi.",
+  "@lessonBody": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonToBoard": "Jadval va uy vazifasi",
+  "settingsMode": "Rejim (demo)",
+  "modeNormal": "Oddiy",
+  "modeNight": "Tungi",
+  "modeLesson": "Dars",
+  "tNavClasses": "Sinflar",
+  "tNavCases": "Murojaatlar",
+  "tClassJoined": "{joined}/{total} oʻquvchi qoʻshildi",
+  "@tClassJoined": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tOpenCases": "{count, plural, =0{Ochiq murojaat yoʻq} other{{count} ochiq murojaat}}",
+  "@tOpenCases": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tCasesEmpty": "Ochiq murojaat yoʻq — bu yaxshi holat.",
+  "tCaseOverdue": "Muddati oʻtgan",
+  "tCaseDue": "Muddat: {time}",
+  "@tCaseDue": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tCaseEvidence": "Dalil",
+  "tCaseHistory": "Tarix",
+  "tCaseActionHide": "Yashirish",
+  "tCaseActionMute": "24 soatga ovozsiz",
+  "tCaseActionEscalate": "Yuqoriga uzatish",
+  "tCaseActionDismiss": "Rad etish",
+  "tCaseNoteHint": "Izoh yozing (majburiy)",
+  "tCaseResolved": "Ish yopildi",
+  "tCaseAnonymous": "Shikoyatchi kim ekani oshkor etilmaydi.",
+  "tGamesSchedule": "Bellashuv rejalashtirish",
+  "tGamesSoon": "Rejalashtirish tez orada.",
+  "pNavChild": "Bolam",
+  "pNavMessages": "Xabarlar",
+  "pDigestTitle": "Haftalik xulosa",
+  "pActiveDays": "{count, plural, other{{count} kun faol boʻldi}}",
+  "@pActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pMinutes": "{count, plural, other{{count} daqiqa}}",
+  "@pMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pPublishedCount": "{count, plural, =0{Post joylamadi} other{{count} ta post joyladi}}",
+  "@pPublishedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pThanksReceived": "{count, plural, other{{count} ta rahmat oldi}}",
+  "@pThanksReceived": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pChildContent": "Farzandingiz postlari",
+  "pChildContentEmpty": "Hali post yoʻq.",
+  "pCases": "Shikoyatlar",
+  "pCasesEmpty": "Farzandingizga oid shikoyat yoʻq.",
+  "pControls": "Boshqaruv",
+  "pTimeLimit": "Kunlik vaqt chegarasi",
+  "pNotifs": "Bildirishnomalar",
+  "pConsentData": "Rozilik va maʼlumotlar",
+  "pConsentGranted": "Rozilik berilgan",
+  "pCollected": "Yigʻiladigan maʼlumotlar",
+  "pNotCollected": "Yigʻilmaydigan maʼlumotlar",
+  "pExport": "Maʼlumotlarni yuklab olish",
+  "pDelete": "Hisobni oʻchirish",
+  "pNoLiveFeed": "Jonli faoliyat lentasi va “onlayn” koʻrsatkichi yoʻq. Bu bolaning ishonchini saqlaydi.",
+  "pMessagesEmpty": "Hozircha xabar yoʻq.",
+  "pMessageTeacher": "Oʻqituvchiga xabar",
+  "rolesTitle": "Sinf rollari",
+  "rolesThisWeek": "Shu hafta",
+  "rolesRotation": "Navbat tartibi",
+  "wallTitle": "Umumiy devor",
+  "wallContributors": "{count, plural, other{{count} ta hissa qoʻshildi}}",
+  "@wallContributors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wallAdd": "Belgi qoʻshish",
+  "wallDone": "Siz hissa qoʻshdingiz",
+  "challengeScreenTitle": "Haftalik chaqiriq",
+  "challengeDeadline": "Muddat: {date}",
+  "@challengeDeadline": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeSubmit": "Ishtirok etish",
+  "challengeEntries": "Sinf ishlari",
+  "challengeSubmitted": "Ishingiz yuborildi",
+  "capsuleTitle": "Vaqt kapsulasi",
+  "capsuleOpenHint": "Kelajakdagi oʻzingizga xat yozing",
+  "capsuleSeals": "{date} da muhrlanadi",
+  "@capsuleSeals": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "capsuleSealedOn": "Muhrlangan: {date}",
+  "@capsuleSealedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "capsuleOpensOn": "Ochiladi: {date}",
+  "@capsuleOpensOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "capsuleNotes": "{count, plural, other{{count} ta xat}}",
+  "@capsuleNotes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "capsuleWrite": "Xat yozish",
+  "capsuleSaved": "Xatingiz kapsulaga saqlandi",
+  "tClassDetail": "Sinf",
+  "tRoster": "Roʻyxat",
+  "tGenerateCode": "Kod yaratish",
+  "tProjectGroups": "Loyiha guruhlari",
+  "tImportTitle": "Roʻyxatni import qilish",
+  "tImportManual": "Qoʻlda qoʻshish",
+  "tImportCsv": "CSV yuklash",
+  "tImportChanges": "Oʻzgarishlar",
+  "tImportApply": "Qoʻllash",
+  "tCodeTitle": "Sinf kodi",
+  "tCodePrint": "A5 chop etish",
+  "tCodeShareNote": "Bu kodni faqat oʻz oʻquvchilaringizga bering.",
+  "tAnnounceTitle": "Eʼlon",
+  "tAnnounceScope": "Koʻrinish",
+  "tScopeClass": "Sinf",
+  "tScopeSchool": "Maktab",
+  "tAnnounceHint": "Eʼlon matni",
+  "tAnnouncePin": "Yuqoriga mahkamlash",
+  "tAnnouncePost": "Joylash",
+  "tAnnouncePosted": "Eʼlon joylandi",
+  "tScheduleTitle": "Bellashuv rejalashtirish",
+  "tPickOpponent": "Raqib sinf",
+  "tPickSubject": "Fan",
+  "tPickWindow": "Vaqt oraligʻi",
+  "tScheduleConfirm": "Rejalashtirish",
+  "tScheduled": "Bellashuv rejalashtirildi",
+  "tChannelTitle": "Sinf kanali",
+  "tChannelNote": "Bu kanal butun sinfga koʻrinadi — shaxsiy emas.",
+  "tChronicleAdmin": "Solnoma boshqaruvi",
+  "tSetCover": "Muqovani belgilash",
+  "tSeal": "Muhrlash",
+  "tExportPdf": "PDF eksport",
+  "meReadingHint": "Qaysi kitobni oʻqiyapsiz?",
+  "meListeningHint": "Qanday musiqa tinglayapsiz?",
+  "meBioHint": "Oʻzingiz haqingizda qisqacha",
+  "meEmpty": "Hali toʻldirilmagan",
+  "meSave": "Saqlash",
+  "classmatesTitle": "Sinfdoshlar",
+  "classmatesOpen": "Sinfdoshlarni koʻrish",
+  "classmatesSubtitle": "Sinfingizdagi doʻstlar",
+  "personReading": "Oʻqiyapti",
+  "personListening": "Tinglayapti",
+  "personInterests": "Qiziqishlar",
+  "personBio": "Bio",
+  "personPhotos": "Suratlar",
+  "personNoInfo": "Hozircha maʼlumot yoʻq",
+  "composeVideo": "Video",
+  "navFeed": "Lenta",
+  "navMunozara": "Munozara",
+  "navCreate": "Yaratish",
+  "navProfile": "Profil",
+  "createPhoto": "Rasm yoki video",
+  "createText": "Matn (munozara)",
+  "createTitle": "Nima yaratamiz?",
+  "repost": "Repost",
+  "repostDone": "Repost qilindi",
+  "repostRemoved": "Repost olib tashlandi",
+  "repostedLabel": "Repost qildingiz",
+  "repostedFrom": "reblog",
+  "share": "Ulashish",
+  "munozaraTitle": "Munozara",
+  "munozaraEmpty": "Hali munozara yoʻq. Birinchi boʻlib yozing!",
+  "munozaraReply": "Javob berish",
+  "munozaraNew": "Yangi munozara",
+  "profileTabPosts": "Postlar",
+  "profileTabReposts": "Repostlar",
+  "profileTabChronicle": "Solnoma",
+  "profileHighlights": "Ajratilgan",
+  "profileNoPosts": "Hali post yoʻq",
+  "profileNoReposts": "Hali repost yoʻq",
+  "feedPhotosEmpty": "Hali surat yoʻq. Birinchi suratni joylang!",
+  "gamesHubTitle": "Oʻyinlar",
+  "gamesHubLead": "Bilim uchun bellash, sinf bilan reytingda yuqoriga chiq",
+  "gamesBattle": "Sinf bellashuvi",
+  "gamesBattleDesc": "Bilim boʻyicha tezkor bellashuv",
+  "gamesLeague": "Reyting",
+  "gamesLeagueDesc": "Sinf va maktab reytingi",
+  "gamesQuiz": "Tezkor viktorina",
+  "gamesQuizDesc": "10 ta savol, vaqtga qarshi",
+  "gamesQuizStart": "Boshlash",
+  "gamesQuizNext": "Keyingi",
+  "gamesQuizResult": "Natija",
+  "gamesQuizAgain": "Yana bir bor",
+  "gamesScore": "Ball",
+  "boardClassHub": "Sinf faoliyati"
+}
