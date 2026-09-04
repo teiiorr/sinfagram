@@ -181,3 +181,29 @@ eases down to 0.96 scale + 0.88 opacity on press and settles back (smooth
 easeOut), on top of the existing InkWell ripples, double-tap heart burst and
 haptics. Still touch-response only (no scroll/entrance animations — the IG rule),
 and honours reduce-motion.
+
+## D-13 — Instagram engagement mechanics (2026-09-05)
+
+Product owner: "not only the design but the mechanics identical to Instagram."
+Chosen: **full IG counts, NO Direct messages.**
+
+Added `lib/features/social/`:
+- **Follow graph** — followsProvider (per-account Set of names, seeded defaults,
+  persisted). Follow/Following buttons on person profile + search/explore.
+- **Following-based home feed** — followingFeedProvider (media posts by followed
+  authors + own, newest first) drives Lenta.
+- **Public likes with counts** — Post.likeCount seeded; PostCard shows the bold
+  "N likes" line; double-tap + heart toggle. (Reverses the earlier count-less
+  choice, per the owner's new answer.)
+- **Save / bookmark** — savedProvider (per-account, persisted); bookmark fills
+  when saved; a Saved tab on the profile (savedPostsProvider).
+- **Profile counts** — posts / followers / following via
+  postsCountProvider/followerCountProvider/followingCountProvider (base pseudo-
+  counts + live follow adjustments). Profile is now a 4-tab grid
+  (posts/saved/reposts/chronicle) with an IG stats row.
+- **Activity screen** (/activity, heart in the feed top bar) — notifications list.
+- **Search / Explore** (/search, search icon) — find people + follow.
+
+**Not built (owner's choice):** Direct messages. Kept: no AI/real imagery of
+minors, anonymous reports. Builds on the strict IG visual system (D-11) + the
+mock multi-account backend (D-12).

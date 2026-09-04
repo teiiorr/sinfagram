@@ -480,5 +480,25 @@
   "gamesQuizQuestion": "Savol",
   "accountsTitle": "Akkauntlar",
   "accountSwitch": "Akkauntni almashtirish",
-  "accountSwitched": "Akkaunt almashtirildi"
+  "accountSwitched": "Akkaunt almashtirildi",
+  "follow": "Kuzatish",
+  "following": "Kuzatilmoqda",
+  "statPosts": "postlar",
+  "statFollowers": "obunachilar",
+  "statFollowing": "obunalar",
+  "profileSaved": "Saqlangan",
+  "profileNoSaved": "Hali saqlangan post yoʻq",
+  "activityTitle": "Bildirishnomalar",
+  "activityEmpty": "Hali bildirishnoma yoʻq",
+  "searchTitle": "Qidirish",
+  "searchHint": "Qidirish",
+  "searchEmpty": "Hech narsa topilmadi",
+  "likesCount": "{count} ta yoqtirish",
+  "@likesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

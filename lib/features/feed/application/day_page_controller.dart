@@ -149,6 +149,7 @@ class DayPageController extends Notifier<Loadable<DayPage>> {
             body:
                 'Bugun matematikadan yangi mavzu — kvadrat tenglamalar. Kim tushunmadi, tushlikda tushuntiraman.',
             commentCount: 3,
+            likeCount: 18,
           ),
           // Photo posts → surfaced in Lenta (media).
           Post(
@@ -159,6 +160,7 @@ class DayPageController extends Notifier<Loadable<DayPage>> {
                 'Biologiya laboratoriyasidan suratlar. Juda qiziqarli tajriba boʻldi!',
             hasPhoto: true,
             commentCount: 5,
+            likeCount: 42,
             thankedByMe: true,
           ),
           Post(
@@ -168,6 +170,7 @@ class DayPageController extends Notifier<Loadable<DayPage>> {
             body:
                 'Ertaga jismoniy tarbiya darsiga sport kiyim olib kelishni unutmang.',
             commentCount: 1,
+            likeCount: 7,
           ),
           Post(
             id: 'p4',
@@ -176,6 +179,7 @@ class DayPageController extends Notifier<Loadable<DayPage>> {
             body: 'Sinf devoriy gazetasi tayyor boʻldi! 🎨',
             hasPhoto: true,
             commentCount: 2,
+            likeCount: 25,
           ),
           Post(
             id: 'p5',
@@ -184,6 +188,7 @@ class DayPageController extends Notifier<Loadable<DayPage>> {
             body: 'Robototexnika toʻgaragidan ishlarimiz.',
             hasPhoto: true,
             commentCount: 4,
+            likeCount: 33,
           ),
           Post(
             id: 'p6',
@@ -192,6 +197,7 @@ class DayPageController extends Notifier<Loadable<DayPage>> {
             body:
                 'Kim ertangi adabiyot uchun sheʼr yodladi? Keling, birga takrorlaymiz.',
             commentCount: 6,
+            likeCount: 11,
           ),
         ],
       );

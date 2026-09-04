@@ -10,6 +10,7 @@ import 'package:sinfagram/core/theme/colors.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/features/feed/application/day_page_controller.dart';
+import 'package:sinfagram/features/social/application/social_controller.dart';
 import 'package:sinfagram/features/feed/domain/post.dart';
 import 'package:sinfagram/features/board/presentation/school_board_carousel.dart';
 import 'package:sinfagram/features/moderation/presentation/report_sheet.dart';
@@ -98,9 +99,9 @@ class DayPageScreen extends ConsumerWidget {
     DayPage day, {
     required bool isStale,
   }) {
-    // Instagram-style: the Lenta feed is photos/videos only. Text-only posts
-    // are surfaced elsewhere (Munozara), so they never enter this list.
-    final photos = day.posts.where((p) => p.hasMedia).toList();
+    // Instagram home feed: media posts from people the viewer follows (plus
+    // their own), newest first. Text-only posts live in Munozara.
+    final photos = ref.watch(followingFeedProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -129,6 +130,7 @@ class DayPageScreen extends ConsumerWidget {
     AppL10n l,
     List<Post> posts,
   ) {
+    final saved = ref.watch(savedProvider);
     final widgets = <Widget>[];
     for (var i = 0; i < posts.length; i++) {
       final p = posts[i];
@@ -145,6 +147,9 @@ class DayPageScreen extends ConsumerWidget {
           thanksLabel: l.thanks,
           thankedByMe: p.thankedByMe,
           onThanks: () => ref.read(dayPageProvider.notifier).toggleThanks(p.id),
+          likeCountLabel: l.likesCount(p.displayLikes),
+          saved: saved.contains(p.id),
+          onSave: () => ref.read(savedProvider.notifier).toggle(p.id),
           commentLabel: l.comments(p.commentCount),
           onComment: () => context.push('/post/${p.id}'),
           onReport: () =>
@@ -263,16 +268,28 @@ class _FeedTopBar extends ConsumerWidget {
               const Spacer(),
               _iconButton(
                 context,
-                icon: isDark ? LucideIcons.sun : LucideIcons.moon,
-                tooltip: l.settingsDarkMode,
-                onTap: () => ref.read(themeModeProvider.notifier).state =
-                    isDark ? ThemeMode.light : ThemeMode.dark,
+                icon: LucideIcons.search,
+                tooltip: l.searchTitle,
+                onTap: () => context.push('/search'),
+              ),
+              _iconButton(
+                context,
+                icon: LucideIcons.heart,
+                tooltip: l.activityTitle,
+                onTap: () => context.push('/activity'),
               ),
               _iconButton(
                 context,
                 icon: LucideIcons.users,
                 tooltip: l.classmatesTitle,
                 onTap: () => context.push('/classmates'),
+              ),
+              _iconButton(
+                context,
+                icon: isDark ? LucideIcons.sun : LucideIcons.moon,
+                tooltip: l.settingsDarkMode,
+                onTap: () => ref.read(themeModeProvider.notifier).state =
+                    isDark ? ThemeMode.light : ThemeMode.dark,
               ),
             ],
           ),

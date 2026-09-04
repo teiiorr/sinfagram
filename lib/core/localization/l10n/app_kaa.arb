@@ -313,5 +313,18 @@
   "gamesQuizQuestion": "Soraw",
   "accountsTitle": "Akkauntlar",
   "accountSwitch": "Akkauntti almastırıw",
-  "accountSwitched": "Akkaunt almastırıldı"
+  "accountSwitched": "Akkaunt almastırıldı",
+  "follow": "Baqlaw",
+  "following": "Baqlanbaqta",
+  "statPosts": "postlar",
+  "statFollowers": "baqlawshılar",
+  "statFollowing": "baqlawlar",
+  "profileSaved": "Saqlanǵan",
+  "profileNoSaved": "Ele saqlanǵan post joq",
+  "activityTitle": "Bildiriwler",
+  "activityEmpty": "Ele bildiriw joq",
+  "searchTitle": "Izlew",
+  "searchHint": "Izlew",
+  "searchEmpty": "Hesh nárse tabılmadı",
+  "likesCount": "{count} ret unatıw"
 }

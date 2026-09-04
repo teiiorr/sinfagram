@@ -1113,4 +1113,45 @@ class AppL10nRu extends AppL10n {
 
   @override
   String get accountSwitched => 'Аккаунт изменён';
+
+  @override
+  String get follow => 'Подписаться';
+
+  @override
+  String get following => 'Вы подписаны';
+
+  @override
+  String get statPosts => 'постов';
+
+  @override
+  String get statFollowers => 'подписчиков';
+
+  @override
+  String get statFollowing => 'подписок';
+
+  @override
+  String get profileSaved => 'Сохранённое';
+
+  @override
+  String get profileNoSaved => 'Пока нет сохранённого';
+
+  @override
+  String get activityTitle => 'Уведомления';
+
+  @override
+  String get activityEmpty => 'Пока нет уведомлений';
+
+  @override
+  String get searchTitle => 'Поиск';
+
+  @override
+  String get searchHint => 'Поиск';
+
+  @override
+  String get searchEmpty => 'Ничего не найдено';
+
+  @override
+  String likesCount(int count) {
+    return 'Нравится: $count';
+  }
 }

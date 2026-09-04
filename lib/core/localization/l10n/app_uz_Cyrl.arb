@@ -313,5 +313,18 @@
   "gamesQuizQuestion": "Савол",
   "accountsTitle": "Аккаунтлар",
   "accountSwitch": "Аккаунтни алмаштириш",
-  "accountSwitched": "Аккаунт алмаштирилди"
+  "accountSwitched": "Аккаунт алмаштирилди",
+  "follow": "Кузатиш",
+  "following": "Кузатилмоқда",
+  "statPosts": "постлар",
+  "statFollowers": "обуначилар",
+  "statFollowing": "обуналар",
+  "profileSaved": "Сақланган",
+  "profileNoSaved": "Ҳали сақланган пост йўқ",
+  "activityTitle": "Билдиришномалар",
+  "activityEmpty": "Ҳали билдиришнома йўқ",
+  "searchTitle": "Қидириш",
+  "searchHint": "Қидириш",
+  "searchEmpty": "Ҳеч нарса топилмади",
+  "likesCount": "{count} та ёқтириш"
 }

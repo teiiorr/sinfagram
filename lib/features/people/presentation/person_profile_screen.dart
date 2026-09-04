@@ -9,6 +9,8 @@ import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/features/people/application/people_controllers.dart';
 import 'package:sinfagram/features/people/domain/person.dart';
+import 'package:sinfagram/features/social/application/social_controller.dart';
+import 'package:sinfagram/shared/widgets/app_button.dart';
 import 'package:sinfagram/shared/widgets/app_chip.dart';
 import 'package:sinfagram/shared/widgets/avatar.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
@@ -57,6 +59,11 @@ class PersonProfileScreen extends ConsumerWidget {
           ),
           children: [
             _Header(person: person),
+            const SizedBox(height: Space.lg),
+            // Instagram stats row + follow CTA for this classmate.
+            _StatsRow(name: person.name),
+            const SizedBox(height: Space.md),
+            _FollowButton(name: person.name),
             const SizedBox(height: Space.lg),
             if (person.bio.isNotEmpty) ...[
               Text(
@@ -151,6 +158,83 @@ class _Header extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The Instagram stats triplet — posts / followers / following — for [name],
+/// read live from the social layer. Three evenly weighted columns: a tabular
+/// number (numeric 16) over a small secondary label. Flat, no dividers.
+class _StatsRow extends ConsumerWidget {
+  const _StatsRow({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppL10n.of(context);
+    final posts = ref.watch(postsCountProvider(name));
+    final followers = ref.watch(followerCountProvider(name));
+    final following = ref.watch(followingCountProvider(name));
+
+    return Row(
+      children: [
+        Expanded(child: _Stat(value: posts, label: l.statPosts)),
+        Expanded(child: _Stat(value: followers, label: l.statFollowers)),
+        Expanded(child: _Stat(value: following, label: l.statFollowing)),
+      ],
+    );
+  }
+}
+
+/// One stat column: number above, label below, centred.
+class _Stat extends StatelessWidget {
+  const _Stat({required this.value, required this.label});
+
+  final int value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$value',
+          style: AppText.numeric
+              .copyWith(fontSize: 16, color: colors.textPrimary),
+        ),
+        const SizedBox(height: Space.xs),
+        Text(
+          label,
+          style: AppText.bodySm.copyWith(color: colors.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
+/// Full-width follow toggle for [name]. Primary "Kuzatish" when not followed,
+/// secondary "Kuzatilmoqda" once followed — wired to [followsProvider].
+class _FollowButton extends ConsumerWidget {
+  const _FollowButton({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppL10n.of(context);
+    final isFollowing = ref.watch(followsProvider).contains(name);
+
+    return SizedBox(
+      width: double.infinity,
+      child: AppButton(
+        isFollowing ? l.following : l.follow,
+        variant:
+            isFollowing ? AppButtonVariant.secondary : AppButtonVariant.primary,
+        onPressed: () => ref.read(followsProvider.notifier).toggle(name),
+      ),
     );
   }
 }

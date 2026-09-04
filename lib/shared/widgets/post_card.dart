@@ -47,6 +47,9 @@ class PostCard extends StatefulWidget {
     this.repostedByMe = false,
     this.repostLabel = '',
     this.repostedMarker,
+    this.likeCountLabel = '',
+    this.saved = false,
+    this.onSave,
     this.heldForReview = false,
     this.waitingLabel,
   });
@@ -85,6 +88,13 @@ class PostCard extends StatefulWidget {
 
   /// Kept for API stability; the "You reposted" marker is no longer rendered.
   final String? repostedMarker;
+
+  /// Formatted public like total ("42 нравится"). Empty hides the line.
+  final String likeCountLabel;
+
+  /// Whether the viewer has saved (bookmarked) this post.
+  final bool saved;
+  final VoidCallback? onSave;
 
   final bool heldForReview;
   final String? waitingLabel;
@@ -139,6 +149,7 @@ class _PostCardState extends State<PostCard>
         ],
         // A post awaiting moderation shows no way to act on it yet.
         if (!widget.heldForReview) _buildActions(context),
+        if (widget.likeCountLabel.isNotEmpty) _buildLikeCount(context),
         if (widget.body.isNotEmpty) _buildCaption(context),
         if (widget.commentLabel.isNotEmpty) _buildCommentLink(context),
         _buildTime(context),
@@ -400,8 +411,9 @@ class _PostCardState extends State<PostCard>
             ),
           _actionIcon(
             context,
-            icon: LucideIcons.bookmark,
+            icon: widget.saved ? Icons.bookmark : LucideIcons.bookmark,
             semanticsLabel: PostCard._saveSemantics,
+            onTap: widget.onSave,
           ),
         ],
       ),
@@ -468,6 +480,17 @@ class _PostCardState extends State<PostCard>
 
   /// Caption: author (600) then the body (14/400) on the same run, clamped to
   /// two lines with an ellipsis standing in for the inline "more".
+  /// The bold "N likes" line above the caption (Instagram).
+  Widget _buildLikeCount(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(Space.md, 2, Space.md, 0),
+      child: Text(
+        widget.likeCountLabel,
+        style: AppText.bodyStrong.copyWith(color: context.colors.textPrimary),
+      ),
+    );
+  }
+
   Widget _buildCaption(BuildContext context) {
     final colors = context.colors;
     return Padding(

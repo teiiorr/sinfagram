@@ -1075,4 +1075,45 @@ class AppL10nKaa extends AppL10n {
 
   @override
   String get accountSwitched => 'Akkaunt almastırıldı';
+
+  @override
+  String get follow => 'Baqlaw';
+
+  @override
+  String get following => 'Baqlanbaqta';
+
+  @override
+  String get statPosts => 'postlar';
+
+  @override
+  String get statFollowers => 'baqlawshılar';
+
+  @override
+  String get statFollowing => 'baqlawlar';
+
+  @override
+  String get profileSaved => 'Saqlanǵan';
+
+  @override
+  String get profileNoSaved => 'Ele saqlanǵan post joq';
+
+  @override
+  String get activityTitle => 'Bildiriwler';
+
+  @override
+  String get activityEmpty => 'Ele bildiriw joq';
+
+  @override
+  String get searchTitle => 'Izlew';
+
+  @override
+  String get searchHint => 'Izlew';
+
+  @override
+  String get searchEmpty => 'Hesh nárse tabılmadı';
+
+  @override
+  String likesCount(int count) {
+    return '$count ret unatıw';
+  }
 }

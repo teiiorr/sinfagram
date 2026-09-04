@@ -1983,6 +1983,84 @@ abstract class AppL10n {
   /// In uz, this message translates to:
   /// **'Akkaunt almashtirildi'**
   String get accountSwitched;
+
+  /// No description provided for @follow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatish'**
+  String get follow;
+
+  /// No description provided for @following.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatilmoqda'**
+  String get following;
+
+  /// No description provided for @statPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'postlar'**
+  String get statPosts;
+
+  /// No description provided for @statFollowers.
+  ///
+  /// In uz, this message translates to:
+  /// **'obunachilar'**
+  String get statFollowers;
+
+  /// No description provided for @statFollowing.
+  ///
+  /// In uz, this message translates to:
+  /// **'obunalar'**
+  String get statFollowing;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlangan'**
+  String get profileSaved;
+
+  /// No description provided for @profileNoSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali saqlangan post yoʻq'**
+  String get profileNoSaved;
+
+  /// No description provided for @activityTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get activityTitle;
+
+  /// No description provided for @activityEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali bildirishnoma yoʻq'**
+  String get activityEmpty;
+
+  /// No description provided for @searchTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get searchTitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get searchHint;
+
+  /// No description provided for @searchEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get searchEmpty;
+
+  /// No description provided for @likesCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta yoqtirish'**
+  String likesCount(int count);
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

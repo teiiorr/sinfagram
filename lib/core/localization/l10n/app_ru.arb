@@ -313,5 +313,18 @@
   "gamesQuizQuestion": "Вопрос",
   "accountsTitle": "Аккаунты",
   "accountSwitch": "Сменить аккаунт",
-  "accountSwitched": "Аккаунт изменён"
+  "accountSwitched": "Аккаунт изменён",
+  "follow": "Подписаться",
+  "following": "Вы подписаны",
+  "statPosts": "постов",
+  "statFollowers": "подписчиков",
+  "statFollowing": "подписок",
+  "profileSaved": "Сохранённое",
+  "profileNoSaved": "Пока нет сохранённого",
+  "activityTitle": "Уведомления",
+  "activityEmpty": "Пока нет уведомлений",
+  "searchTitle": "Поиск",
+  "searchHint": "Поиск",
+  "searchEmpty": "Ничего не найдено",
+  "likesCount": "Нравится: {count}"
 }

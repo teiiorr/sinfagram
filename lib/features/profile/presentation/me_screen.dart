@@ -16,6 +16,7 @@ import 'package:sinfagram/features/feed/application/day_page_controller.dart';
 import 'package:sinfagram/features/feed/domain/post.dart';
 import 'package:sinfagram/features/people/application/people_controllers.dart';
 import 'package:sinfagram/features/people/domain/person.dart';
+import 'package:sinfagram/features/social/application/social_controller.dart';
 import 'package:sinfagram/features/stories/application/stories_controller.dart';
 import 'package:sinfagram/features/stories/domain/story.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
@@ -26,11 +27,12 @@ import 'package:sinfagram/shared/widgets/app_text_field.dart';
 import 'package:sinfagram/shared/widgets/avatar.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
 
-/// S40 — Me. The signed-in pupil's own profile, styled like Instagram but
-/// deliberately **count-less** (product-owner direction, docs/12): no
-/// follower/post/like tallies anywhere. A large avatar + name + class, an
-/// editable "About me" bio, the viewer's story highlights, and a 3-tab grid of
-/// their own posts / reposts / a jump into the class chronicle.
+/// S40 — Me. The signed-in pupil's own profile, styled like Instagram: a large
+/// avatar beside the identity stats row (posts / followers / following), the
+/// name + class, an editable "About me" bio, the viewer's story highlights, and
+/// a 4-tab grid of their own posts / saved posts / reposts / a jump into the
+/// class chronicle. (Full IG counts restored — product-owner direction now
+/// wants tallies, reversing the earlier count-less profile.)
 ///
 /// The profile lives in [myProfileProvider] and is the one profile the pupil
 /// owns and can change. Everything here is scoped to the session.
@@ -53,6 +55,12 @@ class MeScreen extends ConsumerWidget {
         .where((p) => p.authorName == name)
         .toList();
     final reposts = ref.watch(repostedPostsProvider);
+    final savedPosts = ref.watch(savedPostsProvider);
+
+    // Instagram identity counts, scoped to the signed-in pupil.
+    final postsCount = ref.watch(postsCountProvider(name));
+    final followerCount = ref.watch(followerCountProvider(name));
+    final followingCount = ref.watch(followingCountProvider(name));
 
     // The viewer's own story slides drive the highlights row and the avatar ring.
     final mine = ref.watch(storiesProvider).where((st) => st.isMine).toList();
@@ -62,7 +70,7 @@ class MeScreen extends ConsumerWidget {
     final tabBar = _ProfileTabBar(colors: colors, l: l);
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: colors.bg,
         appBar: AppBar(
@@ -116,6 +124,9 @@ class MeScreen extends ConsumerWidget {
                   me: me,
                   slides: slides,
                   hasStory: hasStory,
+                  postsCount: postsCount,
+                  followerCount: followerCount,
+                  followingCount: followingCount,
                   onEdit: () => _openEditor(context, ref, me, l),
                   onOpenStories: () => context.push('/stories/0'),
                 ),
@@ -136,6 +147,12 @@ class MeScreen extends ConsumerWidget {
                   emptyIcon: LucideIcons.image,
                   emptyTitle: l.profileNoPosts,
                   storageKey: 'me.posts',
+                ),
+                _MediaGrid(
+                  posts: savedPosts,
+                  emptyIcon: LucideIcons.bookmark,
+                  emptyTitle: l.profileNoSaved,
+                  storageKey: 'me.saved',
                 ),
                 _MediaGrid(
                   posts: reposts,
@@ -167,9 +184,10 @@ class MeScreen extends ConsumerWidget {
 }
 
 /// The Instagram-style identity block: a 77 px round avatar (flat thin border, or
-/// the story ring when the viewer has a story) beside the name and class, the
-/// "About me" bio (with reading / listening / interests), a full-width secondary
-/// "Edit profile" button, and the story highlights row. No numeric counters.
+/// the story ring when the viewer has a story) beside the stats row (posts /
+/// followers / following), the name + class, the "About me" bio (with reading /
+/// listening / interests), a full-width secondary "Edit profile" button, and the
+/// story highlights row.
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     required this.name,
@@ -177,6 +195,9 @@ class _ProfileHeader extends StatelessWidget {
     required this.me,
     required this.slides,
     required this.hasStory,
+    required this.postsCount,
+    required this.followerCount,
+    required this.followingCount,
     required this.onEdit,
     required this.onOpenStories,
   });
@@ -186,6 +207,9 @@ class _ProfileHeader extends StatelessWidget {
   final Person me;
   final List<StorySlide> slides;
   final bool hasStory;
+  final int postsCount;
+  final int followerCount;
+  final int followingCount;
   final VoidCallback onEdit;
   final VoidCallback onOpenStories;
 
@@ -200,32 +224,34 @@ class _ProfileHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Identity row: avatar + name/class. No stats, by design.
+          // Identity row: avatar + Instagram stats (posts / followers /
+          // following). Counts restored per product direction.
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _RingedAvatar(name: name, hasStory: hasStory),
               const SizedBox(width: Space.lg),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(name,
-                        style: AppText.bodyStrong
-                            .copyWith(color: colors.textPrimary)),
-                    if (classLabel.isNotEmpty) ...[
-                      const SizedBox(height: Space.xs),
-                      Text(classLabel,
-                          style: AppText.bodySm
-                              .copyWith(color: colors.textSecondary)),
-                    ],
-                  ],
+                child: _StatsRow(
+                  posts: postsCount,
+                  followers: followerCount,
+                  following: followingCount,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: Space.lg),
+          const SizedBox(height: Space.md),
+
+          // Name + class sit beneath the stats row, Instagram-style.
+          Text(name,
+              style: AppText.bodyStrong.copyWith(color: colors.textPrimary)),
+          if (classLabel.isNotEmpty) ...[
+            const SizedBox(height: Space.xs),
+            Text(classLabel,
+                style:
+                    AppText.bodySm.copyWith(color: colors.textSecondary)),
+          ],
+          const SizedBox(height: Space.md),
 
           // Bio — the free-text line, soft when empty.
           Text(
@@ -280,6 +306,56 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Instagram identity stats: three evenly-spaced columns (posts / followers /
+/// following), each a bold tabular number over a small secondary label.
+class _StatsRow extends StatelessWidget {
+  const _StatsRow({
+    required this.posts,
+    required this.followers,
+    required this.following,
+  });
+
+  final int posts;
+  final int followers;
+  final int following;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _StatColumn(value: posts, label: l.statPosts),
+        _StatColumn(value: followers, label: l.statFollowers),
+        _StatColumn(value: following, label: l.statFollowing),
+      ],
+    );
+  }
+}
+
+/// One stat column: a 16 px tabular number over a small secondary label.
+class _StatColumn extends StatelessWidget {
+  const _StatColumn({required this.value, required this.label});
+  final int value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$value',
+            style: AppText.numeric
+                .copyWith(fontSize: 16, color: colors.textPrimary)),
+        const SizedBox(height: Space.xs),
+        Text(label,
+            style: AppText.bodySm.copyWith(color: colors.textSecondary)),
+      ],
     );
   }
 }
@@ -434,9 +510,10 @@ class _HighlightsRow extends StatelessWidget {
   }
 }
 
-/// The three icon tabs. Icon-only (no numeric labels): active tab carries a 1 px
-/// top indicator in [colors.textPrimary]; inactive icons are [textSecondary].
-/// Each carries a screen-reader label for accessibility.
+/// The four icon tabs (posts / saved / reposts / chronicle). Icon-only (no
+/// numeric labels): active tab carries a 1 px top indicator in
+/// [colors.textPrimary]; inactive icons are [textSecondary]. Each carries a
+/// screen-reader label for accessibility.
 class _ProfileTabBar extends StatelessWidget {
   const _ProfileTabBar({required this.colors, required this.l});
   final AppColors colors;
@@ -459,6 +536,12 @@ class _ProfileTabBar extends StatelessWidget {
           icon: Semantics(
             label: l.profileTabPosts,
             child: const Icon(LucideIcons.grid3x3),
+          ),
+        ),
+        Tab(
+          icon: Semantics(
+            label: l.profileSaved,
+            child: const Icon(LucideIcons.bookmark),
           ),
         ),
         Tab(

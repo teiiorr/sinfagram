@@ -1075,6 +1075,47 @@ class AppL10nUz extends AppL10n {
 
   @override
   String get accountSwitched => 'Akkaunt almashtirildi';
+
+  @override
+  String get follow => 'Kuzatish';
+
+  @override
+  String get following => 'Kuzatilmoqda';
+
+  @override
+  String get statPosts => 'postlar';
+
+  @override
+  String get statFollowers => 'obunachilar';
+
+  @override
+  String get statFollowing => 'obunalar';
+
+  @override
+  String get profileSaved => 'Saqlangan';
+
+  @override
+  String get profileNoSaved => 'Hali saqlangan post yoʻq';
+
+  @override
+  String get activityTitle => 'Bildirishnomalar';
+
+  @override
+  String get activityEmpty => 'Hali bildirishnoma yoʻq';
+
+  @override
+  String get searchTitle => 'Qidirish';
+
+  @override
+  String get searchHint => 'Qidirish';
+
+  @override
+  String get searchEmpty => 'Hech narsa topilmadi';
+
+  @override
+  String likesCount(int count) {
+    return '$count ta yoqtirish';
+  }
 }
 
 /// The translations for Uzbek, using the Cyrillic script (`uz_Cyrl`).
@@ -2147,4 +2188,45 @@ class AppL10nUzCyrl extends AppL10nUz {
 
   @override
   String get accountSwitched => 'Аккаунт алмаштирилди';
+
+  @override
+  String get follow => 'Кузатиш';
+
+  @override
+  String get following => 'Кузатилмоқда';
+
+  @override
+  String get statPosts => 'постлар';
+
+  @override
+  String get statFollowers => 'обуначилар';
+
+  @override
+  String get statFollowing => 'обуналар';
+
+  @override
+  String get profileSaved => 'Сақланган';
+
+  @override
+  String get profileNoSaved => 'Ҳали сақланган пост йўқ';
+
+  @override
+  String get activityTitle => 'Билдиришномалар';
+
+  @override
+  String get activityEmpty => 'Ҳали билдиришнома йўқ';
+
+  @override
+  String get searchTitle => 'Қидириш';
+
+  @override
+  String get searchHint => 'Қидириш';
+
+  @override
+  String get searchEmpty => 'Ҳеч нарса топилмади';
+
+  @override
+  String likesCount(int count) {
+    return '$count та ёқтириш';
+  }
 }

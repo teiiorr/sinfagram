@@ -45,6 +45,8 @@ import '../../features/profile/presentation/about_screen.dart';
 import '../../features/profile/presentation/me_screen.dart';
 import '../../features/profile/presentation/settings_screen.dart';
 import '../../features/shell/pupil_shell.dart';
+import '../../features/social/presentation/search_screen.dart';
+import '../../features/social/presentation/activity_screen.dart';
 import '../../features/teacher/presentation/teacher_announce_screen.dart';
 import '../../features/teacher/presentation/teacher_case_detail_screen.dart';
 import '../../features/teacher/presentation/teacher_cases_screen.dart';
@@ -259,6 +261,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/chronicle', pageBuilder: _slide(const ChronicleScreen())),
       GoRoute(
           path: '/classmates', pageBuilder: _slide(const ClassmatesScreen())),
+      GoRoute(path: '/search', pageBuilder: _slide(const SearchScreen())),
+      GoRoute(path: '/activity', pageBuilder: _slide(const ActivityScreen())),
       GoRoute(
           path: '/person/:id',
           pageBuilder: (c, s) => _slidePage(

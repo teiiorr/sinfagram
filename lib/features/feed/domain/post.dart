@@ -16,6 +16,7 @@ class Post {
     this.repostedByMe = false,
     this.repostedFromAuthor,
     this.commentCount = 0,
+    this.likeCount = 0,
     this.heldForReview = false,
   });
 
@@ -43,7 +44,14 @@ class Post {
   /// author's name (for the "reblog" attribution line). Null for normal posts.
   final String? repostedFromAuthor;
   final int commentCount;
+
+  /// Base like count from others (excludes the viewer). The displayed total is
+  /// [likeCount] + (thankedByMe ? 1 : 0).
+  final int likeCount;
   final bool heldForReview;
+
+  /// Public like total shown in the feed (base + the viewer's own like).
+  int get displayLikes => likeCount + (thankedByMe ? 1 : 0);
 
   /// True when the post carries real media (photo or video) — the Lenta feed
   /// shows these; text-only posts go to Munozara.
@@ -64,6 +72,7 @@ class Post {
         repostedByMe: repostedByMe ?? this.repostedByMe,
         repostedFromAuthor: repostedFromAuthor,
         commentCount: commentCount,
+        likeCount: likeCount,
         heldForReview: heldForReview,
       );
 }
