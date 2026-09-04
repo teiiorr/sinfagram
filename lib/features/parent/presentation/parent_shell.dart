@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/localization/l10n/app_l10n.dart';
 import '../../../shared/widgets/app_bottom_nav.dart';
@@ -22,9 +21,18 @@ class ParentShell extends StatelessWidget {
         onTap: (i) => navigationShell.goBranch(i,
             initialLocation: i == navigationShell.currentIndex),
         items: [
-          AppNavItem(icon: LucideIcons.graduationCap, label: l.pNavChild),
-          AppNavItem(icon: LucideIcons.messageCircle, label: l.pNavMessages),
-          AppNavItem(icon: LucideIcons.user, label: l.navMe),
+          AppNavItem(
+              icon: Icons.school_outlined,
+              activeIcon: Icons.school,
+              label: l.pNavChild),
+          AppNavItem(
+              icon: Icons.chat_bubble_outline,
+              activeIcon: Icons.chat_bubble,
+              label: l.pNavMessages),
+          AppNavItem(
+              icon: Icons.person_outline,
+              activeIcon: Icons.person,
+              label: l.navMe),
         ],
       ),
     );

@@ -3,17 +3,17 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/motion.dart';
 
-/// A one-shot entrance: fade + rise + a whisper of scale, with an optional
-/// per-index [delay] so lists cascade in. Honours reduce-motion (renders final
-/// state instantly). Compositing-only.
-class Reveal extends StatefulWidget {
+/// Instagram rule: nothing animates on appearance/scroll. [Reveal] is kept as a
+/// pass-through so existing call sites (`Reveal(index:, child:)`) compile while
+/// rendering their child immediately, with no entrance animation.
+class Reveal extends StatelessWidget {
   const Reveal({
     super.key,
     required this.child,
     this.index = 0,
-    this.duration = Motion.celebrate,
-    this.rise = 24.0,
-    this.scaleFrom = 0.88,
+    this.duration = Duration.zero,
+    this.rise = 0,
+    this.scaleFrom = 1,
   });
 
   final Widget child;
@@ -23,69 +23,17 @@ class Reveal extends StatefulWidget {
   final double scaleFrom;
 
   @override
-  State<Reveal> createState() => _RevealState();
+  Widget build(BuildContext context) => child;
 }
 
-class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: widget.duration);
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (reduceMotion(context)) {
-        _c.value = 1;
-        return;
-      }
-      final delay = Motion.stagger * (widget.index.clamp(0, 8));
-      Future<void>.delayed(delay, () {
-        if (mounted) _c.forward();
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (context, child) {
-        final t = Motion.overshoot.transform(_c.value);
-        return Opacity(
-          opacity: _c.value.clamp(0.0, 1.0),
-          child: Transform.translate(
-            offset: Offset(0, widget.rise * (1 - t)),
-            child: Transform.scale(
-                scale: widget.scaleFrom + (1 - widget.scaleFrom) * t,
-                child: child),
-          ),
-        );
-      },
-      child: widget.child,
-    );
-  }
-}
-
-/// Wrap any tappable surface: scales down with a spring on press and fires a
-/// light haptic on tap. Keeps a 44px+ target if [child] already has one.
+/// Wrap any tappable surface: dims to 0.7 opacity while pressed (Instagram press
+/// feedback — opacity, not scale) and fires an optional light haptic on tap.
 class TapScale extends StatefulWidget {
   const TapScale(
-      {super.key,
-      required this.child,
-      this.onTap,
-      this.pressed = 0.9,
-      this.haptic = true});
+      {super.key, required this.child, this.onTap, this.haptic = true});
 
   final Widget child;
   final VoidCallback? onTap;
-  final double pressed;
   final bool haptic;
 
   @override
@@ -112,10 +60,9 @@ class _TapScaleState extends State<TapScale> {
               if (widget.haptic) HapticFeedback.selectionClick();
               widget.onTap!();
             },
-      child: AnimatedScale(
-        scale: _down ? widget.pressed : 1.0,
-        duration: motionOf(context, Motion.base),
-        curve: Motion.spring,
+      child: AnimatedOpacity(
+        opacity: _down ? 0.7 : 1.0,
+        duration: motionOf(context, const Duration(milliseconds: 100)),
         child: widget.child,
       ),
     );

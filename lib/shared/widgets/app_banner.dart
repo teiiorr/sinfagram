@@ -25,7 +25,12 @@ class AppBanner extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: _minHeight),
-      color: colors.warningSubtle,
+      decoration: BoxDecoration(
+        color: colors.warningSubtle,
+        border: Border(
+          bottom: BorderSide(color: colors.border, width: Stroke.hairline),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
       child: Row(
         children: [

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/localization/l10n/app_l10n.dart';
 import '../../../shared/widgets/app_bottom_nav.dart';
@@ -26,10 +25,22 @@ class TeacherShell extends ConsumerWidget {
         onTap: (i) => navigationShell.goBranch(i,
             initialLocation: i == navigationShell.currentIndex),
         items: [
-          AppNavItem(icon: LucideIcons.users, label: l.tNavClasses),
-          AppNavItem(icon: LucideIcons.flag, label: l.tNavCases),
-          AppNavItem(icon: LucideIcons.swords, label: l.navGames),
-          AppNavItem(icon: LucideIcons.user, label: l.navMe),
+          AppNavItem(
+              icon: Icons.people_outline,
+              activeIcon: Icons.people,
+              label: l.tNavClasses),
+          AppNavItem(
+              icon: Icons.flag_outlined,
+              activeIcon: Icons.flag,
+              label: l.tNavCases),
+          AppNavItem(
+              icon: Icons.sports_esports_outlined,
+              activeIcon: Icons.sports_esports,
+              label: l.navGames),
+          AppNavItem(
+              icon: Icons.person_outline,
+              activeIcon: Icons.person,
+              label: l.navMe),
         ],
       ),
     );

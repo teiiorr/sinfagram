@@ -29,11 +29,8 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: c.bg,
       canvasColor: c.surface,
       extensions: [c],
-      // Fredoka is the default family for any unstyled Material slot; the
-      // explicit AppText slots (some Baloo 2) are merged on top and win.
-      textTheme: ThemeData(brightness: brightness, fontFamily: 'Fredoka')
-          .textTheme
-          .merge(_textTheme(c.textPrimary)),
+      // No custom family — the platform's native UI face (SF Pro / Roboto).
+      textTheme: _textTheme(c.textPrimary),
       appBarTheme: AppBarTheme(
         toolbarHeight: 52,
         backgroundColor: c.surface,
@@ -70,7 +67,7 @@ abstract final class AppTheme {
   static TextTheme _textTheme(Color color) {
     TextStyle t(TextStyle s) => s.copyWith(color: color);
     return TextTheme(
-      displayLarge: t(AppText.display),
+      displayLarge: t(AppText.h1),
       headlineMedium: t(AppText.h1),
       titleLarge: t(AppText.h2),
       titleMedium: t(AppText.h3),

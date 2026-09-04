@@ -39,7 +39,7 @@ class _ReportSheetState extends State<_ReportSheet> {
     ];
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(Space.gutter, Space.md, Space.gutter,
+      padding: EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter,
           MediaQuery.viewInsetsOf(context).bottom + Space.md),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -47,15 +47,17 @@ class _ReportSheetState extends State<_ReportSheet> {
         children: [
           Text(l.reportTitle,
               style: AppText.h2.copyWith(color: colors.textPrimary)),
-          const SizedBox(height: Space.md),
+          const SizedBox(height: Space.sm),
+          // Reason radios — the serious (danger) reasons are listed first.
           for (var i = 0; i < reasons.length; i++)
             _reasonRow(context, i, reasons[i]),
-          const SizedBox(height: Space.sm),
+          const SizedBox(height: Space.md),
+          // Anonymity note — the reporter is never revealed to the reported party.
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(LucideIcons.shieldCheck,
-                  size: 16, color: colors.textTertiary),
+                  size: 16, color: colors.textSecondary),
               const SizedBox(width: Space.sm),
               Expanded(
                   child: Text(l.reportWhoSees,
@@ -84,23 +86,25 @@ class _ReportSheetState extends State<_ReportSheet> {
   Widget _reasonRow(BuildContext context, int i, String label) {
     final colors = context.colors;
     final selected = _reason == i;
-    return InkWell(
-      onTap: () => setState(() => _reason = i),
-      borderRadius: BorderRadius.circular(Radii.control),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: Space.sm),
-        child: Row(
-          children: [
-            Icon(
-              selected ? LucideIcons.circleCheck : LucideIcons.circle,
-              size: 22,
-              color: selected ? colors.primary : colors.textTertiary,
-            ),
-            const SizedBox(width: Space.md),
-            Expanded(
-                child: Text(label,
-                    style: AppText.body.copyWith(color: colors.textPrimary))),
-          ],
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: () => setState(() => _reason = i),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Row(
+            children: [
+              Icon(
+                selected ? LucideIcons.circleCheck : LucideIcons.circle,
+                size: 24,
+                color: selected ? colors.primary : colors.textTertiary,
+              ),
+              const SizedBox(width: Space.md),
+              Expanded(
+                  child: Text(label,
+                      style: AppText.body.copyWith(color: colors.textPrimary))),
+            ],
+          ),
         ),
       ),
     );

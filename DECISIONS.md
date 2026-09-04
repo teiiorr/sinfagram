@@ -137,3 +137,28 @@ conic ring; viewer auto-advance kept).
 All D-07/D-08/D-09 product constraints preserved: count-less, private "Rahmat",
 double-tap only adds, anonymous reports, no DMs, no AI/real imagery of minors.
 `Sinfagram.dc.html` (earlier flatter iteration) was superseded per the handoff.
+
+## D-11 — Strict Instagram design system (supersedes D-10 "Play") (2026-09-05)
+
+**Deviation / reversal.** Product owner supplied a detailed "content-first
+Instagram" design brief and asked to redo the design from scratch. This
+**replaces** the D-10 "Play" look. Foundation:
+- **No custom font** — styles omit fontFamily so each platform renders its
+  native UI face (SF Pro / Roboto). Baloo 2 + Fredoka unregistered.
+- **Palette** — white canvas, black text, one blue action `#0095F6`, red
+  `#ED4956` for like/error; everything else grey. Dark theme = pure black
+  inversion; blue + story ring unchanged between themes.
+- **No shadows on static elements** — `Shadows.card/soft/lift` are empty;
+  shadows only on dropdown/modal/toast.
+- **No gradients** except `AppGradients.storyRing` (classic IG 45° ring).
+- **Radii** — feed media 0 (full-bleed), posts are not cards (0), buttons 8,
+  fields 4, modals/sheets 12, previews 8, avatars round.
+- **Type scale** — small & exact, nothing >16px in chrome; icon-only actions.
+- **Motion** — `Reveal` is now a pass-through (no entrance/scroll animations);
+  `TapScale` presses with opacity 0.7 (not scale). Like/double-tap burst kept.
+
+**Product constraints preserved** (D-07/08/09): count-less (no follower/post/
+like numbers), private "Rahmat", reposts count-less + icon-only, no DMs,
+anonymous reports, no AI/real imagery of minors. The two prior tweaks stand:
+feed shows the school-board slide only (friends carousel removed); story rings
+static (no spin).

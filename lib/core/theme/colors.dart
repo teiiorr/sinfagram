@@ -84,54 +84,55 @@ class AppColors extends ThemeExtension<AppColors> {
       dangerSubtle;
   final Color skeleton;
 
-  // "Play" redesign tokens (design handoff). Soft lavender ground, never stark
-  // white; violet brand; warm playful semantics.
+  // Instagram design system (from-scratch redo). White canvas, black text, one
+  // blue action colour, red for like/error; everything else is grey. No brand
+  // gradient anywhere except the story ring (see AppGradients.storyRing).
   static const light = AppColors(
-    bg: Color(0xFFF3EFFF),
+    bg: Color(0xFFFFFFFF),
     surface: Color(0xFFFFFFFF),
     surfaceRaised: Color(0xFFFFFFFF),
-    border: Color(0xFFEDE7FB),
-    borderStrong: Color(0xFFDED5F5),
-    textPrimary: Color(0xFF1C1830),
-    textSecondary: Color(0xFF635B7C),
-    textTertiary: Color(0xFFA79FC0),
+    border: Color(0xFFDBDBDB), // --border-default
+    borderStrong: Color(0xFFA8A8A8), // input focus grey
+    textPrimary: Color(0xFF000000),
+    textSecondary: Color(0xFF737373),
+    textTertiary: Color(0xFFC7C7C7),
     textOnPrimary: Color(0xFFFFFFFF),
-    primary: Color(0xFF6A4CE6),
-    primaryHover: Color(0xFF5B3FE0),
-    primarySubtle: Color(0xFFECE5FF),
-    accent: Color(0xFFE7A63A),
-    accentSubtle: Color(0xFFFBEFD6),
-    success: Color(0xFF27AE60),
-    successSubtle: Color(0xFFDDF3E7),
-    warning: Color(0xFFE7A63A),
-    warningSubtle: Color(0xFFFBEEDA),
-    danger: Color(0xFFE0655B),
-    dangerSubtle: Color(0xFFFBE4E2),
-    skeleton: Color(0xFFECE5FF),
+    primary: Color(0xFF0095F6), // --accent-primary
+    primaryHover: Color(0xFF1877F2),
+    primarySubtle: Color(0xFFEFEFEF), // secondary button / hover fill
+    accent: Color(0xFF00376B), // --text-link (@mentions, #tags)
+    accentSubtle: Color(0xFFFAFAFA),
+    success: Color(0xFF0095F6),
+    successSubtle: Color(0xFFE0F1FF),
+    warning: Color(0xFF737373), // neutral — no amber in this system
+    warningSubtle: Color(0xFFFAFAFA),
+    danger: Color(0xFFED4956),
+    dangerSubtle: Color(0xFFFCE8EA),
+    skeleton: Color(0xFFEFEFEF), // --border-subtle
   );
 
   static const dark = AppColors(
-    bg: Color(0xFF141122),
-    surface: Color(0xFF1E1930),
-    surfaceRaised: Color(0xFF2A2440),
-    border: Color(0xFF2E2745),
-    borderStrong: Color(0xFF3D3557),
-    textPrimary: Color(0xFFF1EDFB),
-    textSecondary: Color(0xFFA79FC0),
-    textTertiary: Color(0xFF7B7398),
+    bg: Color(0xFF000000), // pure black, not #111
+    surface: Color(0xFF000000),
+    surfaceRaised: Color(0xFF121212),
+    border: Color(0xFF262626),
+    borderStrong: Color(0xFF4D4D4D),
+    textPrimary: Color(0xFFF5F5F5),
+    textSecondary: Color(0xFFA8A8A8),
+    textTertiary: Color(0xFF4D4D4D),
     textOnPrimary: Color(0xFFFFFFFF),
-    primary: Color(0xFFB7A6FF),
-    primaryHover: Color(0xFFC9BCFF),
-    primarySubtle: Color(0xFF2A2350),
-    accent: Color(0xFFE7A63A),
-    accentSubtle: Color(0xFF3A2A10),
-    success: Color(0xFF48B27C),
-    successSubtle: Color(0xFF10301F),
-    warning: Color(0xFFE7A63A),
-    warningSubtle: Color(0xFF33240C),
-    danger: Color(0xFFE0655B),
-    dangerSubtle: Color(0xFF3A1917),
-    skeleton: Color(0xFF2A2440),
+    primary: Color(0xFF0095F6), // blue does not change between themes
+    primaryHover: Color(0xFF1877F2),
+    primarySubtle: Color(0xFF262626),
+    accent: Color(0xFFE0F1FF),
+    accentSubtle: Color(0xFF121212),
+    success: Color(0xFF0095F6),
+    successSubtle: Color(0xFF0A1A2A),
+    warning: Color(0xFFA8A8A8),
+    warningSubtle: Color(0xFF121212),
+    danger: Color(0xFFFF3040), // slightly brighter red in dark
+    dangerSubtle: Color(0xFF2A1416),
+    skeleton: Color(0xFF1F1F1F),
   );
 
   @override

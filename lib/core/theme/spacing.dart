@@ -15,50 +15,46 @@ abstract final class Space {
   static const gutter = 16.0;
 }
 
-/// "Play" redesign radii (design handoff). Big, soft, rounded.
+/// Instagram radii. Media in the feed is radius 0 (full-bleed); posts are not
+/// "cards" and carry no radius. Only avatars/story rings are fully round;
+/// modals/sheets are 12, buttons 8, fields 4, grid/reels previews 8.
 abstract final class Radii {
-  static const chip = 10.0;
-  static const control = 15.0; // buttons, inputs
-  static const media = 16.0; // photo/video blocks
-  static const fab = 20.0; // rounded-square FAB (not a circle)
-  static const hero = 24.0; // gradient hero cards
-  static const card = 26.0; // post / discussion / classmate cards, sheets
-  static const sheet = 26.0; // top corners of bottom sheets
-  static const nav = 28.0; // floating nav bar
-  static const lg = 28.0; // large surfaces
-  static const header = 42.0; // feed hero header bottom corners
-  static const avatar = 999.0; // the only place a full round is allowed
+  static const chip = 4.0;
+  static const input = 4.0; // text fields
+  static const control = 8.0; // buttons
+  static const media = 0.0; // feed photo/video — full-bleed, no rounding
+  static const fab = 0.0; // (no FAB in this system)
+  static const hero = 8.0; // reels/grid previews, attachments, tooltips
+  static const card = 0.0; // posts / list blocks are flat, not soft cards
+  static const sheet = 12.0; // top corners of bottom sheets
+  static const nav = 0.0;
+  static const lg = 12.0; // modals
+  static const header = 0.0;
+  static const avatar = 999.0; // avatars + story circles only
 }
 
-/// Shadows — the signature is a **violet-tinted glow**, not a neutral grey
-/// shadow (design handoff). Central to the look; used on both themes.
+/// Shadows exist in exactly three places — dropdown/menu, web modal, toast —
+/// and NOWHERE on a static element (post, avatar, button, field). So the resting
+/// `card`/`soft`/`lift` tokens are intentionally empty.
 abstract final class Shadows {
-  /// Resting cards — violet glow.
-  static const card = [
-    BoxShadow(color: Color(0x246B4CE6), blurRadius: 26, offset: Offset(0, 12)),
-    BoxShadow(color: Color(0x146B4CE6), blurRadius: 8, offset: Offset(0, 3)),
-  ];
+  /// Static surfaces cast no shadow (Instagram rule).
+  static const List<BoxShadow> card = [];
+  static const List<BoxShadow> soft = [];
+  static const List<BoxShadow> lift = [];
 
-  /// Floating nav bar — a broader violet lift.
-  static const soft = [
-    BoxShadow(color: Color(0x3D5A3CC8), blurRadius: 32, offset: Offset(0, 16)),
-    BoxShadow(color: Color(0x0D000000), blurRadius: 10, offset: Offset(0, 4)),
-  ];
-
-  /// A lifted, tappable hero surface / primary CTA / FAB (strong violet glow).
-  static const lift = [
-    BoxShadow(color: Color(0x4C5B3FE0), blurRadius: 24, offset: Offset(0, 14)),
-    BoxShadow(color: Color(0x14000000), blurRadius: 6, offset: Offset(0, 2)),
-  ];
-
-  /// Menus, popovers.
+  /// Dropdowns, context menus. (--shadow-menu)
   static const raised = [
-    BoxShadow(color: Color(0x1F6B4CE6), blurRadius: 16, offset: Offset(0, 6))
+    BoxShadow(color: Color(0x26000000), blurRadius: 12, offset: Offset(0, 4))
   ];
 
-  /// Bottom sheets and dialogs only (upward cast).
+  /// Web modals / dialogs. (--shadow-modal)
   static const overlay = [
-    BoxShadow(color: Color(0x33000000), blurRadius: 40, offset: Offset(0, -10))
+    BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 8))
+  ];
+
+  /// Toasts. (--shadow-toast)
+  static const toast = [
+    BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 2))
   ];
 }
 

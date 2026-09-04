@@ -7,10 +7,8 @@ import 'package:sinfagram/core/app/ui_prefs.dart';
 import 'package:sinfagram/core/async/loadable.dart';
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
-import 'package:sinfagram/features/auth/application/session_controller.dart';
 import 'package:sinfagram/features/feed/application/day_page_controller.dart';
 import 'package:sinfagram/features/feed/domain/post.dart';
 import 'package:sinfagram/features/board/presentation/school_board_carousel.dart';
@@ -28,12 +26,13 @@ import 'package:sinfagram/shared/widgets/skeleton_block.dart';
 /// chronological feed of one class-day, rendered straight in the order it comes
 /// with no ranking of its own.
 ///
-/// The plain toolbar is gone: the feed now opens with the signature gradient
-/// hero header (design handoff) — wordmark, greeting, class + date, glass
-/// controls and the story tray, all on the violet→pink sweep. The school board
-/// carousel rises to overlap the header's curve, then the photo feed follows.
+/// Chrome is a plain Instagram top bar — the wordmark on the left, a theme
+/// toggle and the classmates shortcut on the right, on a white ground with a
+/// single hairline under it. Below it the content scrolls: the story rail, the
+/// (flat) school-board strip, then the full-bleed photo feed. No gradient hero,
+/// no rounded header, no overlap.
 ///
-/// Every one of the four [Loadable] states is still drawn beneath that header. A
+/// Every one of the four [Loadable] states is still drawn in the scroll body. A
 /// refresh that already has a previous day keeps that day on screen, dimmed —
 /// never a spinner over content — so the page never blinks to empty between
 /// reads.
@@ -43,48 +42,46 @@ class DayPageScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppL10n.of(context);
+    final colors = context.colors;
     final state = ref.watch(dayPageProvider);
-    final session = ref.watch(sessionProvider);
 
-    // The day backing the header subtitle: the ready value, or whatever stale
-    // day is held through a load/failure. Class label falls back to the session
-    // so the header still names the class before the first read lands.
-    final titleDay = switch (state) {
-      Ready(:final value) => value,
-      Loading(:final previous) => previous,
-      Failed(:final previous) => previous,
-    };
-    final classLabel = titleDay?.classLabel ?? session?.classLabel ?? '';
-    final dateLabel = titleDay?.dateLabel;
-
-    // Everything under the header, per state. Kept in one block so the whole
-    // thing can rise to overlap the header curve (and dim as one during a
-    // stale reload) while the header itself stays put and fully opaque.
-    final Widget below = switch (state) {
+    // The photo feed, per state. The story rail and board strip above it stay
+    // put — only this section swaps between the four states.
+    final Widget feed = switch (state) {
       // First load with nothing cached: placeholder cards, never a bare spinner.
       Loading(:final previous) => previous == null
-          ? _skeletonBelow()
+          ? _skeletonFeed()
           : Opacity(
               opacity: 0.6,
-              child: _dayBelow(context, ref, l, previous, isStale: false),
+              child: _readyFeed(context, ref, l, previous, isStale: false),
             ),
       Ready(:final value, :final isStale) =>
-        _dayBelow(context, ref, l, value, isStale: isStale),
-      Failed() => _errorBelow(context, ref, l),
+        _readyFeed(context, ref, l, value, isStale: isStale),
+      Failed() => _errorFeed(context, ref, l),
     };
 
     return Scaffold(
+      backgroundColor: colors.bg,
       body: SafeArea(
-        top: false,
-        child: ListView(
-          padding: EdgeInsets.zero,
+        bottom: false,
+        child: Column(
           children: [
-            _FeedHero(classLabel: classLabel, dateLabel: dateLabel),
-            // The board carousel (and the content under it) rises over the
-            // header's rounded bottom, like the design's floating carousel.
-            Transform.translate(
-              offset: const Offset(0, -_overlap),
-              child: below,
+            const _FeedTopBar(),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  // ~104px story rail with a hairline beneath it.
+                  const StoryTray(),
+                  Container(height: Stroke.hairline, color: colors.border),
+                  const SizedBox(height: Space.md),
+                  // Flat school-board strip.
+                  const SchoolBoardCarousel(),
+                  const SizedBox(height: Space.md),
+                  feed,
+                  const SizedBox(height: Space.xxl),
+                ],
+              ),
             ),
           ],
         ),
@@ -92,12 +89,9 @@ class DayPageScreen extends ConsumerWidget {
     );
   }
 
-  /// How far the content below the header rises to overlap the header curve.
-  static const double _overlap = 32;
+  // --- Ready / stale feed ----------------------------------------------------
 
-  // --- Ready / stale list ----------------------------------------------------
-
-  Widget _dayBelow(
+  Widget _readyFeed(
     BuildContext context,
     WidgetRef ref,
     AppL10n l,
@@ -111,10 +105,6 @@ class DayPageScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Overlaps the header curve — its own accent gradient reads as a card
-        // floating on the violet.
-        const SchoolBoardCarousel(),
-        const SizedBox(height: Space.md),
         if (isStale) ...[
           AppBanner(l.bannerOffline),
           const SizedBox(height: Space.md),
@@ -127,11 +117,12 @@ class DayPageScreen extends ConsumerWidget {
           ))
         else
           ..._postWidgets(context, ref, l, photos),
-        const SizedBox(height: Space.xxl + _overlap),
       ],
     );
   }
 
+  /// The full-bleed feed: posts span edge to edge, each carrying its own
+  /// hairline, separated by whitespace. No side gutter.
   List<Widget> _postWidgets(
     BuildContext context,
     WidgetRef ref,
@@ -141,7 +132,7 @@ class DayPageScreen extends ConsumerWidget {
     final widgets = <Widget>[];
     for (var i = 0; i < posts.length; i++) {
       final p = posts[i];
-      widgets.add(_hpad(Reveal(
+      widgets.add(Reveal(
         index: i,
         child: PostCard(
           key: ValueKey(p.id),
@@ -172,7 +163,7 @@ class DayPageScreen extends ConsumerWidget {
           heldForReview: p.heldForReview,
           waitingLabel: l.composeReview,
         ),
-      )));
+      ));
       if (i != posts.length - 1) {
         widgets.add(const SizedBox(height: Space.sm));
       }
@@ -182,14 +173,9 @@ class DayPageScreen extends ConsumerWidget {
 
   // --- Loading & failure -----------------------------------------------------
 
-  Widget _skeletonBelow() {
+  Widget _skeletonFeed() {
     return const Padding(
-      padding: EdgeInsets.fromLTRB(
-        Space.gutter,
-        Space.md,
-        Space.gutter,
-        Space.xxl + _overlap,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: Space.gutter),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -203,15 +189,10 @@ class DayPageScreen extends ConsumerWidget {
     );
   }
 
-  Widget _errorBelow(BuildContext context, WidgetRef ref, AppL10n l) {
+  Widget _errorFeed(BuildContext context, WidgetRef ref, AppL10n l) {
     final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        Space.gutter,
-        Space.md,
-        Space.gutter,
-        Space.xxl + _overlap,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
       child: AppCard(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -241,135 +222,90 @@ class DayPageScreen extends ConsumerWidget {
 
   // --- Shared ----------------------------------------------------------------
 
-  /// Applies the page gutter to a single item, leaving full-bleed items
-  /// (the banner) untouched.
+  /// Applies the page gutter to a single item (empty state, etc.), leaving
+  /// full-bleed items untouched.
   Widget _hpad(Widget child) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
         child: child,
       );
 }
 
-/// The signature gradient hero at the top of the feed (design handoff): the
-/// violet→pink sweep with rounded bottom corners, carrying the wordmark, a
-/// personal greeting, the class + date, two "glass" controls, and the story
-/// tray. It replaces the plain toolbar entirely.
-class _FeedHero extends ConsumerWidget {
-  const _FeedHero({required this.classLabel, this.dateLabel});
-
-  final String classLabel;
-  final String? dateLabel;
+/// The plain Instagram top bar: wordmark left, two 24px icon buttons right
+/// (theme toggle + classmates). White ground, a single hairline beneath, no
+/// shadow. It is fixed chrome — the story rail and feed scroll under it.
+class _FeedTopBar extends ConsumerWidget {
+  const _FeedTopBar();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppL10n.of(context);
-    final topInset = MediaQuery.of(context).padding.top;
+    final colors = context.colors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final session = ref.watch(sessionProvider);
-    final first = (session?.displayName ?? '').split(' ').first.trim();
-    // TODO(l10n): add feedGreeting(name) once l10n can be regenerated; for now
-    // this is a name interpolation, not translatable copy.
-    final greeting = first.isEmpty ? 'Salom!' : 'Salom, $first!';
-
-    final subtitle = [
-      classLabel,
-      if (dateLabel != null && dateLabel!.isNotEmpty) dateLabel!,
-    ].where((s) => s.isNotEmpty).join(' · ');
-
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: const BoxDecoration(
-        gradient: AppGradients.hero,
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(Radii.header),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(
+          bottom: BorderSide(color: colors.border, width: Stroke.hairline),
         ),
       ),
-      // Horizontal gutter is applied per-row so the story tray can bleed to the
-      // header edges; the generous bottom leaves room for the carousel overlap.
-      padding: EdgeInsets.fromLTRB(0, 12 + topInset, 0, 64),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        // Brand wordmark (proper noun — not localised copy).
-                        'Sinfagram',
-                        style: AppText.wordmark.copyWith(
-                          color: Colors.white.withValues(alpha: 0.82),
-                        ),
-                      ),
-                      const SizedBox(height: Space.xs),
-                      Text(
-                        greeting,
-                        style: AppText.display.copyWith(color: Colors.white),
-                      ),
-                      if (subtitle.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppText.bodySm.copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(width: Space.sm),
-                _glassButton(
-                  icon: isDark ? LucideIcons.sun : LucideIcons.moon,
-                  tooltip: l.settingsDarkMode,
-                  onTap: () => ref.read(themeModeProvider.notifier).state =
-                      isDark ? ThemeMode.light : ThemeMode.dark,
-                ),
-                const SizedBox(width: Space.sm),
-                _glassButton(
-                  icon: LucideIcons.users,
-                  tooltip: l.classmatesTitle,
-                  onTap: () => context.push('/classmates'),
-                ),
-              ],
-            ),
+      child: SizedBox(
+        height: 52,
+        child: Padding(
+          padding: const EdgeInsets.only(left: Space.gutter, right: Space.sm),
+          child: Row(
+            children: [
+              Text(
+                // Brand wordmark (proper noun — not localised copy).
+                'Sinfagram',
+                style: AppText.wordmark.copyWith(color: colors.textPrimary),
+              ),
+              const Spacer(),
+              _iconButton(
+                context,
+                icon: isDark ? LucideIcons.sun : LucideIcons.moon,
+                tooltip: l.settingsDarkMode,
+                onTap: () => ref.read(themeModeProvider.notifier).state =
+                    isDark ? ThemeMode.light : ThemeMode.dark,
+              ),
+              _iconButton(
+                context,
+                icon: LucideIcons.users,
+                tooltip: l.classmatesTitle,
+                onTap: () => context.push('/classmates'),
+              ),
+            ],
           ),
-          const SizedBox(height: Space.sm),
-          // Rings already carry the conic gradient and pop on the violet.
-          const StoryTray(),
-        ],
+        ),
       ),
     );
   }
 
-  /// A 42×42 translucent "glass" control that sits on the gradient.
-  Widget _glassButton({
+  /// A 24px icon on a 44×44 target, with tooltip + semantics (icon-only rule).
+  Widget _iconButton(
+    BuildContext context, {
     required IconData icon,
-    required VoidCallback onTap,
     required String tooltip,
+    required VoidCallback onTap,
   }) {
-    return Tooltip(
-      message: tooltip,
-      child: TapScale(
-        onTap: onTap,
-        child: Container(
-          width: 42,
-          height: 42,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white24,
-            borderRadius: BorderRadius.circular(Radii.media),
+    final colors = context.colors;
+    return Semantics(
+      button: true,
+      label: tooltip,
+      child: Tooltip(
+        message: tooltip,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 24,
+          splashColor: colors.primary.withValues(alpha: 0.06),
+          highlightColor: colors.primary.withValues(alpha: 0.06),
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: Icon(icon, size: 24, color: colors.textPrimary),
+            ),
           ),
-          child: Icon(icon, size: 20, color: Colors.white),
         ),
       ),
     );

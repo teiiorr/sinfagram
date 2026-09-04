@@ -1,14 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
@@ -19,8 +15,8 @@ import 'package:sinfagram/shared/widgets/app_button.dart';
 import 'package:sinfagram/shared/widgets/app_card.dart';
 
 /// S23 — battle result (docs/07 §7.5). The score is the CLASS's; no per-pupil
-/// score is shown to anyone. Exactly one celebratory ring fires here on a win
-/// (docs/06 §6.9), once per result.
+/// score is shown to anyone. A flat header (no gradient, no confetti) with a
+/// neutral badge, the verdict and the class-vs-class score.
 class BattleResultScreen extends ConsumerStatefulWidget {
   const BattleResultScreen({super.key, required this.battleId});
 
@@ -30,9 +26,7 @@ class BattleResultScreen extends ConsumerStatefulWidget {
   ConsumerState<BattleResultScreen> createState() => _BattleResultScreenState();
 }
 
-class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ring;
+class _BattleResultScreenState extends ConsumerState<BattleResultScreen> {
   late final int _classScore;
   late final int _opponentScore;
   late final BattleStatus _status;
@@ -50,25 +44,6 @@ class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
         : (_classScore < _opponentScore
             ? BattleStatus.lose
             : BattleStatus.draw);
-
-    _ring = AnimationController(vsync: this, duration: Motion.celebrate);
-    if (_status == BattleStatus.win) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        if (reduceMotion(context)) {
-          _ring.value = 1;
-        } else {
-          HapticFeedback.mediumImpact();
-          _ring.forward();
-        }
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _ring.dispose();
-    super.dispose();
   }
 
   @override
@@ -168,15 +143,15 @@ class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
 
   Widget _hero(
       BuildContext context, String title, String myClass, String oppClass) {
+    final colors = context.colors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(
-          Space.gutter, Space.xxl, Space.gutter, Space.xl),
-      decoration: const BoxDecoration(
-        gradient: AppGradients.battle,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+          Space.gutter, Space.xl, Space.gutter, Space.xl),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(
+          bottom: BorderSide(color: colors.border, width: Stroke.hairline),
         ),
       ),
       child: Column(
@@ -185,68 +160,53 @@ class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
           const SizedBox(height: Space.md),
           Text(title,
               textAlign: TextAlign.center,
-              style: AppText.h1.copyWith(color: Colors.white)),
-          const SizedBox(height: Space.lg),
-          _scoreLine(context, myClass, oppClass),
+              style: AppText.h1.copyWith(color: colors.textPrimary)),
+          const SizedBox(height: Space.xs),
+          Text('$myClass — $oppClass',
+              textAlign: TextAlign.center,
+              style: AppText.bodySm.copyWith(color: colors.textSecondary)),
+          const SizedBox(height: Space.md),
+          _scoreLine(context),
         ],
       ),
     );
   }
 
   Widget _badge(BuildContext context) {
-    final win = _status == BattleStatus.win;
+    final colors = context.colors;
     final icon = switch (_status) {
       BattleStatus.win => LucideIcons.trophy,
       BattleStatus.draw => LucideIcons.swords,
       BattleStatus.lose => LucideIcons.shield,
     };
-    return SizedBox(
-      width: 90,
-      height: 90,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (win)
-            AnimatedBuilder(
-              animation: _ring,
-              builder: (_, __) => CustomPaint(
-                  size: const Size(90, 90),
-                  painter: _RingPainter(_ring.value, Colors.white)),
-            ),
-          Container(
-            width: 74,
-            height: 74,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
-              shape: BoxShape.circle,
-              border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.35),
-                  width: Stroke.hairline),
-            ),
-            child: Icon(icon, color: Colors.white, size: 34),
-          ),
-        ],
+    return Container(
+      width: 72,
+      height: 72,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.primarySubtle,
+        shape: BoxShape.circle,
       ),
+      child: Icon(icon, color: colors.textPrimary, size: 32),
     );
   }
 
-  Widget _scoreLine(BuildContext context, String myClass, String oppClass) {
-    final base = AppText.numeric.copyWith(fontSize: 38, color: Colors.white);
+  Widget _scoreLine(BuildContext context) {
+    final colors = context.colors;
+    final base = AppText.numeric.copyWith(fontSize: 24);
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: RichText(
         text: TextSpan(
-          style: base,
+          style: base.copyWith(color: colors.textPrimary),
           children: [
-            TextSpan(text: '$myClass  $_classScore'),
+            TextSpan(text: '$_classScore'),
             TextSpan(
                 text: '  —  ',
-                style:
-                    base.copyWith(color: Colors.white.withValues(alpha: 0.6))),
+                style: base.copyWith(color: colors.textTertiary)),
             TextSpan(
-                text: '$oppClass  $_opponentScore',
-                style: base.copyWith(
-                    color: Colors.white.withValues(alpha: 0.75))),
+                text: '$_opponentScore',
+                style: base.copyWith(color: colors.textSecondary)),
           ],
         ),
       ),
@@ -286,22 +246,18 @@ class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
 
   Widget _subjectBar(BuildContext context, double fraction) {
     final colors = context.colors;
-    final mineFlex = (fraction * 1000).round().clamp(1, 1000);
-    final oppFlex = ((1 - fraction) * 1000).round().clamp(1, 1000);
+    // Thin flat bar: the class's share fills blue over a grey track.
     return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(2),
       child: SizedBox(
-        height: 7,
-        child: Row(
+        height: 4,
+        child: Stack(
           children: [
-            Expanded(
-              flex: mineFlex,
-              child: const DecoratedBox(
-                  decoration: BoxDecoration(gradient: AppGradients.league)),
-            ),
-            Expanded(
-              flex: oppFlex,
-              child: ColoredBox(color: colors.primarySubtle),
+            Positioned.fill(child: ColoredBox(color: colors.skeleton)),
+            FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: fraction.clamp(0.0, 1.0),
+              child: ColoredBox(color: colors.primary),
             ),
           ],
         ),
@@ -315,7 +271,7 @@ class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
       padding: const EdgeInsets.all(Space.md),
       decoration: BoxDecoration(
         color: colors.primarySubtle,
-        borderRadius: BorderRadius.circular(Radii.card),
+        borderRadius: BorderRadius.circular(Radii.hero),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,28 +286,4 @@ class _BattleResultScreenState extends ConsumerState<BattleResultScreen>
       ),
     );
   }
-}
-
-/// A single accent ring that draws itself once (docs/06 §6.9). Nothing loops.
-class _RingPainter extends CustomPainter {
-  const _RingPainter(this.progress, this.color);
-  final double progress;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    final rect = Rect.fromCircle(
-        center: size.center(Offset.zero), radius: size.width / 2 - 3);
-    canvas.drawArc(rect, -math.pi / 2, math.pi * 2 * progress.clamp(0.0, 1.0),
-        false, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _RingPainter old) =>
-      old.progress != progress || old.color != color;
 }

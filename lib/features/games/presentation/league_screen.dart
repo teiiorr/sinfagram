@@ -6,7 +6,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
@@ -15,9 +14,9 @@ import 'package:sinfagram/features/games/domain/game.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
 
-/// S24 — league table (docs/07 §7.5). Scope switcher (gradient-filled active
-/// chip); each row carries a points bar; the viewer's OWN class row is tinted
-/// with primary text. Class-level only — no per-pupil data anywhere.
+/// S24 — league table (docs/07 §7.5). Scope switcher (blue-filled active chip,
+/// outlined inactive chips); each row carries a thin points bar; the viewer's
+/// OWN class row is tinted with primary. Class-level only — no per-pupil data.
 class LeagueScreen extends ConsumerStatefulWidget {
   const LeagueScreen({super.key});
 
@@ -95,13 +94,11 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
       padding: const EdgeInsets.symmetric(
           horizontal: Space.md, vertical: Space.sm + 2),
       decoration: BoxDecoration(
-        gradient: active ? AppGradients.primary : null,
-        color: active ? null : colors.surface,
+        color: active ? colors.primary : colors.surface,
         borderRadius: BorderRadius.circular(Radii.control),
         border: active
             ? null
             : Border.all(color: colors.border, width: Stroke.hairline),
-        boxShadow: active ? Shadows.card : null,
       ),
       child: Text(
         label,
@@ -114,10 +111,9 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
   Widget _row(BuildContext context, LeagueRow r, int maxPoints, int index) {
     final colors = context.colors;
     final isOwn = r.isOwn;
-    final isFirst = r.rank == 1;
-    final rankColor = isOwn
-        ? colors.primary
-        : (isFirst ? colors.accent : colors.textSecondary);
+    // One blue action colour only — rank is blue for the viewer's own class,
+    // grey otherwise (no gold first-place accent in this system).
+    final rankColor = isOwn ? colors.primary : colors.textSecondary;
     final nameColor = isOwn ? colors.primary : colors.textPrimary;
     final pointsColor = isOwn ? colors.primary : colors.textPrimary;
     final fraction =
@@ -133,7 +129,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
             horizontal: Space.md, vertical: Space.sm + 4),
         decoration: BoxDecoration(
           color: isOwn ? colors.primarySubtle : Colors.transparent,
-          borderRadius: BorderRadius.circular(Radii.card),
+          borderRadius: BorderRadius.circular(Radii.hero),
         ),
         child: Row(
           children: [
@@ -169,21 +165,23 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> {
 
   Widget _bar(BuildContext context, double fraction, bool isOwn) {
     final colors = context.colors;
+    // Thin flat bar: a grey track with a solid blue fill. On the own-class row
+    // the highlight is already primarySubtle, so the track switches to surface
+    // to stay visible.
     return ClipRRect(
-      borderRadius: BorderRadius.circular(3),
+      borderRadius: BorderRadius.circular(2),
       child: SizedBox(
-        height: 6,
+        height: 4,
         child: Stack(
           children: [
             Positioned.fill(
               child: ColoredBox(
-                  color: isOwn ? colors.surface : colors.primarySubtle),
+                  color: isOwn ? colors.surface : colors.skeleton),
             ),
             FractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: fraction,
-              child: const DecoratedBox(
-                  decoration: BoxDecoration(gradient: AppGradients.league)),
+              child: ColoredBox(color: colors.primary),
             ),
           ],
         ),

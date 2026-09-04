@@ -119,18 +119,15 @@ class _AppTextFieldState extends State<AppTextField> {
     final colors = context.colors;
     final bool hasError = widget.errorText != null;
 
-    // Error owns the colour; focus owns the weight. Combined, an errored field
-    // that is focused reads as a 2 px danger ring.
+    // Instagram-subtle: a single hairline border throughout. Error recolours it
+    // to danger; focus darkens it to a grey [borderStrong] — never blue, never a
+    // glow. The width never changes, so nothing shifts as focus comes and goes.
     final Color borderColor = hasError
         ? colors.danger
         : _focused
-            ? colors.primary
+            ? colors.borderStrong
             : colors.border;
-    final double borderWidth = _focused ? Stroke.focus : Stroke.hairline;
-
-    // The ring's extra pixel is absorbed by shrinking the padding, so the outer
-    // box and the text baseline never shift as focus grows or releases.
-    final double ringInset = borderWidth - Stroke.hairline;
+    const double borderWidth = Stroke.hairline;
 
     final int length = _controller.text.characters.length;
     final bool showCounter = widget.maxLength != null &&
@@ -170,14 +167,14 @@ class _AppTextFieldState extends State<AppTextField> {
           // A min height (not a fixed one) lets the field grow for large text
           // scales and extra lines without clipping.
           constraints: const BoxConstraints(minHeight: Space.xl + Space.sm),
-          padding: EdgeInsets.symmetric(
-            horizontal: Space.md - ringInset,
-            vertical: Space.sm - ringInset,
+          padding: const EdgeInsets.symmetric(
+            horizontal: Space.md,
+            vertical: Space.sm,
           ),
           decoration: BoxDecoration(
             color: colors.surface,
             border: Border.all(color: borderColor, width: borderWidth),
-            borderRadius: BorderRadius.circular(Radii.control),
+            borderRadius: BorderRadius.circular(Radii.input),
           ),
           child: TextField(
             controller: _controller,

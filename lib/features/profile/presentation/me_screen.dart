@@ -17,14 +17,13 @@ import 'package:sinfagram/features/people/application/people_controllers.dart';
 import 'package:sinfagram/features/people/domain/person.dart';
 import 'package:sinfagram/features/stories/application/stories_controller.dart';
 import 'package:sinfagram/features/stories/domain/story.dart';
+import 'package:sinfagram/shared/motion/motion_widgets.dart';
 import 'package:sinfagram/shared/widgets/app_bottom_sheet.dart';
 import 'package:sinfagram/shared/widgets/app_button.dart';
-import 'package:sinfagram/shared/widgets/app_card.dart';
 import 'package:sinfagram/shared/widgets/app_chip.dart';
 import 'package:sinfagram/shared/widgets/app_text_field.dart';
 import 'package:sinfagram/shared/widgets/avatar.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
-import 'package:sinfagram/shared/widgets/icon_tile.dart';
 
 /// S40 — Me. The signed-in pupil's own profile, styled like Instagram but
 /// deliberately **count-less** (product-owner direction, docs/12): no
@@ -54,9 +53,10 @@ class MeScreen extends ConsumerWidget {
         .toList();
     final reposts = ref.watch(repostedPostsProvider);
 
-    // The viewer's own story slides drive the highlights row.
+    // The viewer's own story slides drive the highlights row and the avatar ring.
     final mine = ref.watch(storiesProvider).where((st) => st.isMine).toList();
     final slides = mine.isEmpty ? const <StorySlide>[] : mine.first.slides;
+    final hasStory = slides.isNotEmpty;
 
     final tabBar = _ProfileTabBar(colors: colors, l: l);
 
@@ -65,9 +65,11 @@ class MeScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: colors.bg,
         appBar: AppBar(
-          title: Text(name),
+          title: Text(name, style: AppText.h1.copyWith(color: colors.textPrimary)),
           actions: [
             IconButton(
+              tooltip: l.meSettings,
+              color: colors.textPrimary,
               icon: const Icon(LucideIcons.menu),
               onPressed: () => showAppBottomSheet<void>(
                 context: context,
@@ -86,6 +88,7 @@ class MeScreen extends ConsumerWidget {
                   classLabel: classLabel,
                   me: me,
                   slides: slides,
+                  hasStory: hasStory,
                   onEdit: () => _openEditor(context, ref, me, l),
                   onOpenStories: () => context.push('/stories/0'),
                 ),
@@ -136,8 +139,9 @@ class MeScreen extends ConsumerWidget {
   }
 }
 
-/// The Instagram-style identity block: a large ringed avatar beside the name and
-/// class, the "About me" bio (with reading / listening / interests), a full-width
+/// The Instagram-style identity block: a 77 px round avatar (flat thin border, or
+/// the story ring when the viewer has a story) beside the name and class, the
+/// "About me" bio (with reading / listening / interests), a full-width secondary
 /// "Edit profile" button, and the story highlights row. No numeric counters.
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
@@ -145,6 +149,7 @@ class _ProfileHeader extends StatelessWidget {
     required this.classLabel,
     required this.me,
     required this.slides,
+    required this.hasStory,
     required this.onEdit,
     required this.onOpenStories,
   });
@@ -153,6 +158,7 @@ class _ProfileHeader extends StatelessWidget {
   final String classLabel;
   final Person me;
   final List<StorySlide> slides;
+  final bool hasStory;
   final VoidCallback onEdit;
   final VoidCallback onOpenStories;
 
@@ -167,10 +173,11 @@ class _ProfileHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Identity row: ringed avatar + name/class. No stats, by design.
+          // Identity row: avatar + name/class. No stats, by design.
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _RingedAvatar(name: name),
+              _RingedAvatar(name: name, hasStory: hasStory),
               const SizedBox(width: Space.lg),
               Expanded(
                 child: Column(
@@ -178,7 +185,8 @@ class _ProfileHeader extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(name,
-                        style: AppText.h1.copyWith(color: colors.textPrimary)),
+                        style: AppText.bodyStrong
+                            .copyWith(color: colors.textPrimary)),
                     if (classLabel.isNotEmpty) ...[
                       const SizedBox(height: Space.xs),
                       Text(classLabel,
@@ -201,10 +209,9 @@ class _ProfileHeader extends StatelessWidget {
           ),
           const SizedBox(height: Space.md),
 
-          // Personality lines — small lucide icons, IG-bio style.
+          // Personality lines — small neutral lucide icons, IG-bio style.
           _BioLine(
             icon: LucideIcons.bookOpen,
-            color: AppAccents.amber,
             label: l.meReading,
             value: me.reading,
             empty: l.meEmpty,
@@ -212,7 +219,6 @@ class _ProfileHeader extends StatelessWidget {
           const SizedBox(height: Space.sm),
           _BioLine(
             icon: LucideIcons.music,
-            color: AppAccents.pink,
             label: l.meListening,
             value: me.listening,
             empty: l.meEmpty,
@@ -224,7 +230,7 @@ class _ProfileHeader extends StatelessWidget {
               runSpacing: Space.sm,
               children: [
                 for (final t in me.interests)
-                  AppChip(t, variant: AppChipVariant.accent),
+                  AppChip(t, variant: AppChipVariant.neutral),
               ],
             ),
           ],
@@ -251,44 +257,57 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-/// A large avatar wrapped in the brand story-ring (hero gradient).
+/// A 77 px round avatar. Flat thin border by default; when the viewer has a
+/// story it wears the one allowed gradient in the product — the story ring.
 class _RingedAvatar extends StatelessWidget {
-  const _RingedAvatar({required this.name});
+  const _RingedAvatar({required this.name, required this.hasStory});
   final String name;
+  final bool hasStory;
+
+  static const double _size = 77;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+
+    if (!hasStory) {
+      return Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: colors.border, width: Stroke.hairline),
+        ),
+        child: Avatar(name: name, size: _size),
+      );
+    }
+
     return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(2.5),
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: AppGradients.hero,
-        boxShadow: Shadows.lift,
+        gradient: AppGradients.storyRing,
       ),
       child: Container(
-        padding: const EdgeInsets.all(3),
+        padding: const EdgeInsets.all(2.5),
         decoration:
             BoxDecoration(shape: BoxShape.circle, color: colors.surface),
-        child: Avatar(name: name, size: 82),
+        child: Avatar(name: name, size: _size),
       ),
     );
   }
 }
 
-/// One "icon + label + value" bio line. Shows [empty] softly when [value] is
-/// blank, so the reading/listening rows never read as broken.
+/// One "icon + label + value" bio line. The icon is neutral grey (never a brand
+/// colour). Shows [empty] softly when [value] is blank, so the reading /
+/// listening rows never read as broken.
 class _BioLine extends StatelessWidget {
   const _BioLine({
     required this.icon,
-    required this.color,
     required this.label,
     required this.value,
     required this.empty,
   });
 
   final IconData icon;
-  final Color color;
   final String label;
   final String value;
   final String empty;
@@ -302,7 +321,7 @@ class _BioLine extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 16, color: color),
+          child: Icon(icon, size: 16, color: colors.textSecondary),
         ),
         const SizedBox(width: Space.sm),
         Expanded(
@@ -330,8 +349,9 @@ class _BioLine extends StatelessWidget {
   }
 }
 
-/// Horizontal row of gradient-ring story-highlight bubbles. Every bubble opens
-/// the viewer's own story.
+/// Horizontal row of story-highlight bubbles: flat 64 px circles with a hairline
+/// border and a faint grey media placeholder. Every bubble opens the viewer's
+/// own story.
 class _HighlightsRow extends StatelessWidget {
   const _HighlightsRow({required this.slides, required this.onTap});
   final List<StorySlide> slides;
@@ -341,7 +361,7 @@ class _HighlightsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return SizedBox(
-      height: 104,
+      height: 96,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.zero,
@@ -351,30 +371,23 @@ class _HighlightsRow extends StatelessWidget {
           final slide = slides[i];
           return SizedBox(
             width: 72,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
+            child: TapScale(
               onTap: onTap,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(2.5),
-                    decoration: const BoxDecoration(
+                    width: 64,
+                    height: 64,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: AppGradients.hero,
+                      color: colors.skeleton,
+                      border: Border.all(
+                          color: colors.border, width: Stroke.hairline),
                     ),
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: colors.surfaceRaised,
-                        border: Border.all(color: colors.surface, width: 2),
-                      ),
-                      child: Icon(LucideIcons.image,
-                          size: 22, color: colors.textTertiary),
-                    ),
+                    child: Icon(LucideIcons.image,
+                        size: 22, color: colors.textTertiary),
                   ),
                   const SizedBox(height: Space.xs),
                   Text(
@@ -394,8 +407,9 @@ class _HighlightsRow extends StatelessWidget {
   }
 }
 
-/// The three icon tabs. Icon-only (no numeric labels), each carrying a screen
-/// reader label for accessibility.
+/// The three icon tabs. Icon-only (no numeric labels): active tab carries a 1 px
+/// top indicator in [colors.textPrimary]; inactive icons are [textSecondary].
+/// Each carries a screen-reader label for accessibility.
 class _ProfileTabBar extends StatelessWidget {
   const _ProfileTabBar({required this.colors, required this.l});
   final AppColors colors;
@@ -404,11 +418,14 @@ class _ProfileTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TabBar(
-      indicatorColor: colors.textPrimary,
+      indicator: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: colors.textPrimary, width: Stroke.hairline),
+        ),
+      ),
       indicatorSize: TabBarIndicatorSize.tab,
-      indicatorWeight: 2,
       labelColor: colors.textPrimary,
-      unselectedLabelColor: colors.textTertiary,
+      unselectedLabelColor: colors.textSecondary,
       dividerColor: Colors.transparent,
       tabs: [
         Tab(
@@ -434,8 +451,9 @@ class _ProfileTabBar extends StatelessWidget {
   }
 }
 
-/// Pins the [tabBar] under the header while the grids scroll. Icon-only tabs
-/// keep a fixed height regardless of the text-scale factor.
+/// Pins the [tabBar] under the header while the grids scroll. The strip carries
+/// a hairline divider on top (IG-style, above the tabs). Icon-only tabs keep a
+/// fixed height regardless of the text-scale factor.
 class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   _TabBarDelegate({
     required this.tabBar,
@@ -462,7 +480,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
       decoration: BoxDecoration(
         color: background,
         border: Border(
-          bottom: BorderSide(color: border, width: Stroke.hairline),
+          top: BorderSide(color: border, width: Stroke.hairline),
         ),
       ),
       child: SizedBox(height: _height, child: tabBar),
@@ -529,8 +547,8 @@ class _MediaGrid extends StatelessWidget {
   }
 }
 
-/// One grid cell: the real device photo when present, otherwise a deterministic
-/// gradient placeholder with a faint image glyph. Tapping opens the post.
+/// One grid cell: the real device photo when present, otherwise a flat grey
+/// placeholder with a faint image glyph. Radius 0. Tapping opens the post.
 class _GridCell extends StatelessWidget {
   const _GridCell({required this.post});
   final Post post;
@@ -544,9 +562,9 @@ class _GridCell extends StatelessWidget {
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
-            errorBuilder: (_, __, ___) => _placeholder(),
+            errorBuilder: (context, __, ___) => _placeholder(context),
           )
-        : _placeholder();
+        : _placeholder(context);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -555,24 +573,20 @@ class _GridCell extends StatelessWidget {
     );
   }
 
-  Widget _placeholder() {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: AppGradients.of(AppAccents.forSeed(post.id)),
-      ),
+  Widget _placeholder(BuildContext context) {
+    final colors = context.colors;
+    return ColoredBox(
+      color: colors.skeleton,
       child: Center(
-        child: Icon(
-          LucideIcons.image,
-          size: 28,
-          color: Colors.white.withValues(alpha: 0.5),
-        ),
+        child: Icon(LucideIcons.image, size: 28, color: colors.textTertiary),
       ),
     );
   }
 }
 
 /// The Solnoma (chronicle) tab: a centered tappable tile into the class
-/// chronicle. Kept scrollable so it plays nicely inside the [NestedScrollView].
+/// chronicle. Flat, on-token — no gradient tile. Kept scrollable so it plays
+/// nicely inside the [NestedScrollView].
 class _ChronicleTab extends StatelessWidget {
   const _ChronicleTab();
 
@@ -590,14 +604,13 @@ class _ChronicleTab extends StatelessWidget {
               padding: const EdgeInsets.all(Space.lg),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 320),
-                child: AppCard(
+                child: TapScale(
                   onTap: () => context.push('/chronicle'),
-                  padding: const EdgeInsets.all(Space.lg),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconTile(LucideIcons.scrollText,
-                          color: AppAccents.violet, size: 56),
+                      Icon(LucideIcons.scrollText,
+                          size: 40, color: colors.textSecondary),
                       const SizedBox(height: Space.md),
                       Text(
                         l.profileTabChronicle,
@@ -639,7 +652,6 @@ class _MenuSheet extends ConsumerWidget {
               router.push('/classmates');
             },
           ),
-          const SizedBox(height: Space.sm),
           _SheetRow(
             icon: LucideIcons.settings,
             label: l.meSettings,
@@ -649,7 +661,6 @@ class _MenuSheet extends ConsumerWidget {
               router.push('/settings');
             },
           ),
-          const SizedBox(height: Space.sm),
           _SheetRow(
             icon: LucideIcons.info,
             label: l.meAbout,
@@ -659,7 +670,6 @@ class _MenuSheet extends ConsumerWidget {
               router.push('/about');
             },
           ),
-          const SizedBox(height: Space.sm),
           _SheetRow(
             icon: LucideIcons.logOut,
             label: l.meSignOut,
@@ -676,7 +686,8 @@ class _MenuSheet extends ConsumerWidget {
   }
 }
 
-/// A tappable menu row: a colourful leading tile, a label, and a chevron.
+/// A flat, tappable menu row: a plain leading icon, a label, and a chevron. No
+/// colourful tile, no card border — a quiet list row.
 class _SheetRow extends StatelessWidget {
   const _SheetRow({
     required this.icon,
@@ -694,25 +705,32 @@ class _SheetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final labelColor = danger ? colors.danger : colors.textPrimary;
-    final tileColor = danger ? AppAccents.red : AppAccents.forSeed(label);
+    final iconColor = danger ? colors.danger : colors.textPrimary;
 
     return MergeSemantics(
-      child: AppCard(
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 28),
-          child: Row(
-            children: [
-              IconTile(icon, color: tileColor, size: 44),
-              const SizedBox(width: Space.md),
-              Expanded(
-                child: Text(label,
-                    style: AppText.body.copyWith(color: labelColor)),
+      child: Semantics(
+        button: true,
+        label: label,
+        child: TapScale(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: Space.sm),
+              child: Row(
+                children: [
+                  Icon(icon, size: 24, color: iconColor),
+                  const SizedBox(width: Space.md),
+                  Expanded(
+                    child: Text(label,
+                        style: AppText.body.copyWith(color: labelColor)),
+                  ),
+                  const SizedBox(width: Space.md),
+                  Icon(LucideIcons.chevronRight,
+                      size: 20, color: colors.textTertiary),
+                ],
               ),
-              const SizedBox(width: Space.md),
-              Icon(LucideIcons.chevronRight,
-                  size: 20, color: colors.textTertiary),
-            ],
+            ),
           ),
         ),
       ),

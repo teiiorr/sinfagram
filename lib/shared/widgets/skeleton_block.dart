@@ -2,11 +2,10 @@ import 'package:flutter/widgets.dart';
 
 import 'package:sinfagram/core/theme/colors.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
-import 'package:sinfagram/shared/motion/motion_widgets.dart';
 
-/// A placeholder rectangle for loading states with a moving sheen (DECISIONS.md
-/// — a more noticeable shimmer was requested; still one cheap animated
-/// ShaderMask, and it falls back to a static tint under reduce-motion).
+/// A placeholder rectangle for loading states — Instagram flat. A static fill in
+/// [AppColors.skeleton]; no shimmer (a moving sheen is a gradient, disallowed
+/// everywhere but the story ring), no shadow.
 ///
 /// A null [width] fills the available width, so a stack of these reads as text
 /// lines; give an explicit width for chips, avatars, or fixed cells.
@@ -20,21 +19,15 @@ class SkeletonBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = context.colors.skeleton;
-    // A lighter band sweeps across the base fill.
-    final highlight = Color.lerp(base, context.colors.surface, 0.6)!;
-
-    final box = SizedBox(
+    return SizedBox(
       width: width ?? double.infinity,
       height: height,
       child: DecoratedBox(
         decoration: BoxDecoration(
-            color: base, borderRadius: BorderRadius.circular(radius)),
+          color: context.colors.skeleton,
+          borderRadius: BorderRadius.circular(radius),
+        ),
       ),
-    );
-
-    return RepaintBoundary(
-      child: Shimmer(base: base, highlight: highlight, child: box),
     );
   }
 }

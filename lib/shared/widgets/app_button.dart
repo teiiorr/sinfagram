@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 
 /// Visual weight of an [AppButton]. Only one `primary` should be on screen at a
-/// time; everything else is `secondary` or `ghost`. docs/05 §5.5.
+/// time; everything else is `secondary`, `ghost` or `danger`. docs/05 §5.5.
 enum AppButtonVariant { primary, secondary, ghost, danger }
 
 /// Control height. `md` is the default; `lg` is for primary calls-to-action that
 /// deserve a wider touch surface (onboarding, submit-a-form). docs/05 §5.5.
 enum AppButtonSize { md, lg }
 
-/// The one button in the system. Flat fill or hairline border, a single press
-/// scale, an in-place loading ring — no gradients, glows, or bounce. docs/05 §5.5.
+/// The one button in the system — Instagram flat. A solid blue primary, a
+/// grey-fill secondary, a transparent ghost/danger; radius [Radii.control] (8),
+/// white [AppText.label] on the primary. No gradient, no shadow, no press-scale
+/// — the press is a simple opacity dip. docs/05 §5.5.
 class AppButton extends StatefulWidget {
   const AppButton(
     this.label, {
@@ -37,7 +38,7 @@ class AppButton extends StatefulWidget {
   final AppButtonSize size;
 
   /// Optional leading icon. During [loading] it is swapped for the ring in the
-  /// same 16 px slot, so the button never changes width.
+  /// same 20 px slot, so the button never changes width.
   final IconData? icon;
   final bool loading;
 
@@ -46,11 +47,10 @@ class AppButton extends StatefulWidget {
 }
 
 class _AppButtonState extends State<AppButton> {
-  // Control dimensions from docs/05 §5.5. Used as *floors* (minHeight) so text
-  // scaled to 1.6x grows the button instead of clipping.
-  // Larger controls per the product-owner direction (bigger buttons).
-  static const double _heightMd = 48;
-  static const double _heightLg = 56;
+  // Control dimensions used as *floors* (minHeight) so text scaled to 1.6x grows
+  // the button instead of clipping.
+  static const double _heightMd = 44;
+  static const double _heightLg = 52;
 
   // Leading icon / spinner box. Both share this size so the loading swap is
   // pixel-for-pixel and the label never shifts.
@@ -59,7 +59,8 @@ class _AppButtonState extends State<AppButton> {
   // Accessibility floor for the tappable region, independent of the visual height.
   static const double _minTouch = 44;
 
-  static const double _pressedScale = 0.98;
+  // Instagram press feedback: a flat opacity dip, no scale.
+  static const double _pressedOpacity = 0.7;
 
   bool _pressed = false;
 
@@ -71,44 +72,31 @@ class _AppButtonState extends State<AppButton> {
   }
 
   Color _background(AppColors c) {
-    // A disabled button reads the same across variants: a flat, recessive fill.
-    if (_disabled) return c.border;
+    if (_disabled) {
+      // A disabled filled button reads as a flat recessive fill; transparent
+      // variants stay transparent.
+      return switch (widget.variant) {
+        AppButtonVariant.primary => c.primarySubtle,
+        AppButtonVariant.secondary => c.primarySubtle,
+        AppButtonVariant.ghost => Colors.transparent,
+        AppButtonVariant.danger => Colors.transparent,
+      };
+    }
     return switch (widget.variant) {
-      AppButtonVariant.primary => _pressed ? c.primaryHover : c.primary,
-      // No dedicated danger-hover role; the press scale carries the feedback.
-      AppButtonVariant.danger => c.danger,
-      AppButtonVariant.secondary => c.surface,
+      AppButtonVariant.primary => c.primary,
+      AppButtonVariant.secondary => c.primarySubtle,
       AppButtonVariant.ghost => Colors.transparent,
+      AppButtonVariant.danger => Colors.transparent,
     };
-  }
-
-  /// Primary CTAs carry the brand gradient for a premium read (DECISIONS.md).
-  /// Other variants stay flat.
-  Gradient? _gradient(AppColors c) {
-    if (_disabled) return null;
-    return widget.variant == AppButtonVariant.primary
-        ? AppGradients.primary
-        : null;
   }
 
   Color _foreground(AppColors c) {
     if (_disabled) return c.textTertiary;
     return switch (widget.variant) {
       AppButtonVariant.primary => c.textOnPrimary,
-      AppButtonVariant.danger => c.textOnPrimary,
       AppButtonVariant.secondary => c.textPrimary,
       AppButtonVariant.ghost => c.primary,
-    };
-  }
-
-  List<BoxShadow>? _shadow() {
-    // Filled buttons get the faint resting card shadow; the border carries the
-    // separation for secondary, and ghost has nothing to lift. Pressed = flat.
-    if (_disabled || _pressed) return null;
-    return switch (widget.variant) {
-      AppButtonVariant.primary => Shadows.lift,
-      AppButtonVariant.danger => Shadows.card,
-      _ => null,
+      AppButtonVariant.danger => c.danger,
     };
   }
 
@@ -120,7 +108,7 @@ class _AppButtonState extends State<AppButton> {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,
-      style: AppText.h3.copyWith(color: fg),
+      style: AppText.label.copyWith(color: fg),
     );
 
     final ring = SizedBox(
@@ -143,7 +131,7 @@ class _AppButtonState extends State<AppButton> {
                 ? ring
                 : Icon(widget.icon, size: _iconSize, color: fg),
           ),
-          const SizedBox(width: Space.xs),
+          const SizedBox(width: Space.sm),
           label,
         ],
       );
@@ -167,24 +155,17 @@ class _AppButtonState extends State<AppButton> {
 
     final height = widget.size == AppButtonSize.lg ? _heightLg : _heightMd;
     final hPad = widget.size == AppButtonSize.lg ? Space.lg : Space.md;
-    // Transparent inset that lifts a sub-44 control (md) up to the touch floor
-    // without changing its painted height.
+    // Transparent inset that lifts a sub-44 control up to the touch floor without
+    // changing its painted height.
     final touchInset = ((_minTouch - height) / 2).clamp(0.0, double.infinity);
 
-    final visual = AnimatedContainer(
-      duration: motionOf(context, Motion.fast),
-      curve: Motion.press,
+    final visual = Container(
       constraints: BoxConstraints(minHeight: height),
       alignment: Alignment.center,
       padding: EdgeInsets.symmetric(horizontal: hPad, vertical: Space.sm),
       decoration: BoxDecoration(
-        color: _gradient(c) == null ? _background(c) : null,
-        gradient: _gradient(c),
+        color: _background(c),
         borderRadius: BorderRadius.circular(Radii.control),
-        border: (widget.variant == AppButtonVariant.secondary && !_disabled)
-            ? Border.all(color: c.border)
-            : null,
-        boxShadow: _shadow(),
       ),
       child: _content(c),
     );
@@ -209,8 +190,8 @@ class _AppButtonState extends State<AppButton> {
             : null,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: touchInset),
-          child: AnimatedScale(
-            scale: _pressed ? _pressedScale : 1,
+          child: AnimatedOpacity(
+            opacity: _pressed ? _pressedOpacity : 1,
             duration: motionOf(context, Motion.fast),
             curve: Motion.press,
             child: visual,

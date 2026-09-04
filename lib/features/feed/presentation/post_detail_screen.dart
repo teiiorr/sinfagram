@@ -5,9 +5,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:sinfagram/core/async/loadable.dart';
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
+import 'package:sinfagram/features/auth/application/session_controller.dart';
 import 'package:sinfagram/features/feed/application/comments_controller.dart';
 import 'package:sinfagram/features/feed/application/day_page_controller.dart';
 import 'package:sinfagram/features/feed/domain/comment.dart';
@@ -33,6 +33,7 @@ class PostDetailScreen extends ConsumerStatefulWidget {
 
 class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   final _controller = TextEditingController();
+  final _composerFocus = FocusNode();
   var _canSend = false;
 
   @override
@@ -47,6 +48,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _composerFocus.dispose();
     super.dispose();
   }
 
@@ -127,7 +129,13 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                     )
                   else
                     for (var i = 0; i < comments.length; i++)
-                      Reveal(index: i, child: _CommentRow(comments[i])),
+                      Reveal(
+                        index: i,
+                        child: _CommentRow(
+                          comments[i],
+                          onReply: () => _composerFocus.requestFocus(),
+                        ),
+                      ),
                 ],
               ),
             ),
@@ -138,47 +146,57 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  /// Pinned bottom composer: a soft pill input on the page ground and a circular
-  /// gradient send button. The button carries the brand gradient once there is
-  /// text to send, and drops to a flat recessive fill while empty.
+  /// Pinned bottom composer (Instagram-style): the current user's 24px avatar, a
+  /// flat bordered text field (radius 4, hairline border that goes grey on focus)
+  /// and a plain text "Yuborish" action that is blue when there is something to
+  /// send and recedes to tertiary grey while empty. Flat — the only line is the
+  /// hairline that separates the composer from the thread above it.
   Widget _composer(BuildContext context, AppL10n l, AppColors colors) {
+    final me = ref.watch(sessionProvider)?.displayName ?? 'Siz';
     return Container(
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border(
             top: BorderSide(color: colors.border, width: Stroke.hairline)),
       ),
-      padding:
-          const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, Space.sm),
+      padding: const EdgeInsets.fromLTRB(
+          Space.gutter, Space.sm, Space.gutter, Space.sm),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Avatar(name: me, size: 24),
+          const SizedBox(width: Space.sm),
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: Space.md, vertical: Space.sm),
-              decoration: BoxDecoration(
-                color: colors.bg,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: TextField(
-                controller: _controller,
-                minLines: 1,
-                maxLines: 4,
-                textCapitalization: TextCapitalization.sentences,
-                cursorColor: colors.primary,
-                style: AppText.body.copyWith(color: colors.textPrimary),
-                decoration: InputDecoration(
-                  isCollapsed: true,
-                  border: InputBorder.none,
-                  hintText: l.commentHint,
-                  hintStyle:
-                      AppText.body.copyWith(color: colors.textTertiary),
+            child: TextField(
+              controller: _controller,
+              focusNode: _composerFocus,
+              minLines: 1,
+              maxLines: 4,
+              textCapitalization: TextCapitalization.sentences,
+              cursorColor: colors.primary,
+              style: AppText.body.copyWith(color: colors.textPrimary),
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: colors.surface,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: Space.md, vertical: Space.sm),
+                hintText: l.commentHint,
+                hintStyle: AppText.body.copyWith(color: colors.textTertiary),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(Radii.input),
+                  borderSide:
+                      BorderSide(color: colors.border, width: Stroke.hairline),
                 ),
-                onSubmitted: (_) {
-                  if (_canSend) _send();
-                },
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(Radii.input),
+                  borderSide: BorderSide(
+                      color: colors.borderStrong, width: Stroke.hairline),
+                ),
               ),
+              onSubmitted: (_) {
+                if (_canSend) _send();
+              },
             ),
           ),
           const SizedBox(width: Space.sm),
@@ -188,20 +206,21 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             label: l.actionSend,
             child: TapScale(
               onTap: _canSend ? _send : null,
-              child: Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: _canSend ? AppGradients.primary : null,
-                  color: _canSend ? null : colors.border,
-                  boxShadow: _canSend ? Shadows.card : null,
-                ),
-                child: Icon(
-                  LucideIcons.send,
-                  size: 20,
-                  color: _canSend ? colors.textOnPrimary : colors.textTertiary,
+              child: ConstrainedBox(
+                constraints:
+                    const BoxConstraints(minWidth: 44, minHeight: 44),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Space.sm),
+                  child: Center(
+                    widthFactor: 1,
+                    child: Text(
+                      l.actionSend,
+                      style: AppText.label.copyWith(
+                        color:
+                            _canSend ? colors.primary : colors.textTertiary,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -213,40 +232,84 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 }
 
 class _CommentRow extends StatelessWidget {
-  const _CommentRow(this.comment);
+  const _CommentRow(this.comment, {this.onReply});
 
   final Comment comment;
 
+  /// Focuses the composer so the person can answer this comment.
+  final VoidCallback? onReply;
+
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.only(bottom: Space.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Avatar(name: comment.author, size: 38),
+          Avatar(name: comment.author, size: 32),
           const SizedBox(width: Space.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // First line: name + comment as one flowing paragraph, with a
+                // small heart pinned to the right (no bubble, no count).
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                        child: Text(comment.author,
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(children: [
+                          TextSpan(
+                            text: comment.author,
                             style: AppText.bodyStrong
                                 .copyWith(color: colors.textPrimary),
-                            overflow: TextOverflow.ellipsis)),
+                          ),
+                          const TextSpan(text: ' '),
+                          TextSpan(
+                            text: comment.body,
+                            style: AppText.body
+                                .copyWith(color: colors.textPrimary),
+                          ),
+                        ]),
+                      ),
+                    ),
                     const SizedBox(width: Space.sm),
-                    Text(comment.timeLabel,
-                        style: AppText.caption
-                            .copyWith(color: colors.textTertiary)),
+                    // Decorative private heart (count-less); no like model on
+                    // comments, so it carries no tap and stays out of the a11y tree.
+                    ExcludeSemantics(
+                      child: Icon(LucideIcons.heart,
+                          size: 12, color: colors.textSecondary),
+                    ),
                   ],
                 ),
                 const SizedBox(height: Space.xs),
-                Text(comment.body,
-                    style: AppText.body.copyWith(color: colors.textPrimary)),
+                // Meta line: time then a "reply" action, 12px apart (8 + 4).
+                Row(
+                  children: [
+                    Text(comment.timeLabel,
+                        style: AppText.caption
+                            .copyWith(color: colors.textSecondary)),
+                    const SizedBox(width: Space.sm + Space.xs),
+                    Semantics(
+                      button: true,
+                      label: l.munozaraReply,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: onReply,
+                        child: Text(
+                          l.munozaraReply,
+                          style: AppText.caption.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

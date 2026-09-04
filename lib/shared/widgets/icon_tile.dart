@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
 
-import 'package:sinfagram/core/theme/gradients.dart';
+import 'package:sinfagram/core/theme/colors.dart';
+import 'package:sinfagram/core/theme/spacing.dart';
 
-/// A large, colourful rounded icon tile — a white glyph on a vivid accent
-/// gradient (DECISIONS.md — bigger, colourful icons). Use as the leading element
-/// of list rows and section cards instead of a small monotone icon.
+/// A rounded leading icon tile — Instagram flat. The glyph renders in
+/// [AppColors.textPrimary] on a quiet [AppColors.primarySubtle] tile with radius
+/// [Radii.hero] (8). The [color] argument is kept for API stability but is
+/// deliberately ignored: this system has no per-tile accent colour.
 class IconTile extends StatelessWidget {
   const IconTile(this.icon, {super.key, required this.color, this.size = 48});
 
   final IconData icon;
+
+  /// Kept for API stability; ignored — every tile is neutral.
   final Color color;
+
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       width: size,
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        gradient: AppGradients.of(color),
-        borderRadius: BorderRadius.circular(size * 0.32),
-        boxShadow: [
-          BoxShadow(
-              color: color.withValues(alpha: 0.32),
-              blurRadius: 12,
-              offset: const Offset(0, 6))
-        ],
+        color: colors.primarySubtle,
+        borderRadius: BorderRadius.circular(Radii.hero),
       ),
-      child: Icon(icon, color: Colors.white, size: size * 0.5),
+      child: Icon(icon, color: colors.textPrimary, size: size * 0.5),
     );
   }
 }

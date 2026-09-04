@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 
-/// A content container. Surface fill, hairline border, soft ambient depth.
-/// When [onTap] is given the card becomes pressable — a 6% primary splash plus a
-/// subtle press-scale settle (DECISIONS.md — elevated look). Otherwise inert.
-class AppCard extends StatefulWidget {
+/// A content container — Instagram flat. Surface fill, a single hairline border,
+/// radius [Radii.card] (0), and no shadow. When [onTap] is given the card is
+/// pressable with a quiet primary splash; there is no press-scale.
+class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
@@ -20,27 +19,15 @@ class AppCard extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
 
   @override
-  State<AppCard> createState() => _AppCardState();
-}
-
-class _AppCardState extends State<AppCard> {
-  bool _pressed = false;
-
-  void _set(bool v) {
-    if (v != _pressed) setState(() => _pressed = v);
-  }
-
-  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final resolvedPadding = widget.padding ?? const EdgeInsets.all(Space.md);
+    final resolvedPadding = padding ?? const EdgeInsets.all(Space.md);
 
-    Widget content = Padding(padding: resolvedPadding, child: widget.child);
+    Widget content = Padding(padding: resolvedPadding, child: child);
 
-    if (widget.onTap != null) {
+    if (onTap != null) {
       content = InkWell(
-        onTap: widget.onTap,
-        onHighlightChanged: _set,
+        onTap: onTap,
         borderRadius: BorderRadius.circular(Radii.card),
         splashColor: colors.primary.withValues(alpha: 0.06),
         highlightColor: colors.primary.withValues(alpha: 0.05),
@@ -48,12 +35,11 @@ class _AppCardState extends State<AppCard> {
       );
     }
 
-    final card = DecoratedBox(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border.all(color: colors.border, width: Stroke.hairline),
         borderRadius: BorderRadius.circular(Radii.card),
-        boxShadow: Shadows.card,
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -61,15 +47,6 @@ class _AppCardState extends State<AppCard> {
         clipBehavior: Clip.antiAlias,
         child: content,
       ),
-    );
-
-    if (widget.onTap == null) return card;
-
-    return AnimatedScale(
-      scale: _pressed ? 0.985 : 1.0,
-      duration: motionOf(context, Motion.micro),
-      curve: Motion.press,
-      child: card,
     );
   }
 }

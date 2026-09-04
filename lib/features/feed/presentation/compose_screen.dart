@@ -180,7 +180,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     const SizedBox(height: Space.md),
                     if (_photoPath != null) ...[
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(Radii.media),
+                        borderRadius: BorderRadius.circular(Radii.hero),
                         child: AspectRatio(
                           aspectRatio: 4 / 3,
                           child:
@@ -191,7 +191,7 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
                     ],
                     if (_videoPath != null) ...[
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(Radii.media),
+                        borderRadius: BorderRadius.circular(Radii.hero),
                         child: AspectRatio(
                           aspectRatio: 16 / 9,
                           child: PostVideo(path: _videoPath!),
@@ -239,8 +239,8 @@ class _ComposeScreenState extends ConsumerState<ComposeScreen> {
 
   /// App-bar-style header: close (X) left, centred title, post button right.
   /// A [Stack] keeps the title truly centred regardless of the side controls'
-  /// widths. The post button is a primary [AppButton] — the brand gradient when
-  /// there is text to post, its own flat disabled fill otherwise.
+  /// widths. The post button is a primary [AppButton] — enabled once there is
+  /// text to post, its flat disabled fill otherwise.
   Widget _topBar(BuildContext context, AppL10n l, AppColors colors) {
     return Padding(
       padding: const EdgeInsets.all(Space.sm),

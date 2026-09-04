@@ -5,21 +5,19 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/features/people/application/people_controllers.dart';
 import 'package:sinfagram/features/people/domain/person.dart';
-import 'package:sinfagram/shared/motion/motion_widgets.dart';
 import 'package:sinfagram/shared/widgets/app_chip.dart';
 import 'package:sinfagram/shared/widgets/avatar.dart';
 import 'package:sinfagram/shared/widgets/empty_state.dart';
 
 /// A single person's profile — a classmate's read-only page (or the viewer's own
-/// when [personId] is `me`). A read-only mirror of the "Me" profile: a ringed
-/// avatar beside the name and class, the free-text bio, the "now reading / now
-/// listening" personality lines, interest chips and a decorative photo wall.
-/// Sections cascade in with a staggered [Reveal]. No counters, by design.
+/// when [personId] is `me`). A flat, count-less mirror of the "Me" profile: an
+/// avatar with a hairline border beside the name and class, the free-text bio,
+/// the "now reading / now listening" personality lines, interest chips and a
+/// flat photo grid. No counters, no gradients, by design.
 class PersonProfileScreen extends ConsumerWidget {
   const PersonProfileScreen({super.key, required this.personId});
 
@@ -58,58 +56,41 @@ class PersonProfileScreen extends ConsumerWidget {
             Space.xl,
           ),
           children: [
-            Reveal(index: 0, child: _Header(person: person)),
+            _Header(person: person),
             const SizedBox(height: Space.lg),
             if (person.bio.isNotEmpty) ...[
-              Reveal(
-                index: 1,
-                child: Text(
-                  person.bio,
-                  style: AppText.body.copyWith(color: colors.textPrimary),
-                ),
+              Text(
+                person.bio,
+                style: AppText.body.copyWith(color: colors.textPrimary),
               ),
               const SizedBox(height: Space.md),
             ],
-            Reveal(
-              index: 2,
-              child: _BioLine(
-                icon: LucideIcons.bookOpen,
-                color: AppAccents.amber,
-                label: l.personReading,
-                value: person.reading,
-                empty: l.personNoInfo,
-              ),
+            _BioLine(
+              icon: LucideIcons.bookOpen,
+              label: l.personReading,
+              value: person.reading,
+              empty: l.personNoInfo,
             ),
             const SizedBox(height: Space.sm),
-            Reveal(
-              index: 3,
-              child: _BioLine(
-                icon: LucideIcons.music,
-                color: AppAccents.pink,
-                label: l.personListening,
-                value: person.listening,
-                empty: l.personNoInfo,
-              ),
+            _BioLine(
+              icon: LucideIcons.music,
+              label: l.personListening,
+              value: person.listening,
+              empty: l.personNoInfo,
             ),
             if (person.interests.isNotEmpty) ...[
               const SizedBox(height: Space.md),
-              Reveal(
-                index: 4,
-                child: Wrap(
-                  spacing: Space.sm,
-                  runSpacing: Space.sm,
-                  children: [
-                    for (final tag in person.interests)
-                      AppChip(tag, variant: AppChipVariant.accent),
-                  ],
-                ),
+              Wrap(
+                spacing: Space.sm,
+                runSpacing: Space.sm,
+                children: [
+                  for (final tag in person.interests)
+                    AppChip(tag, variant: AppChipVariant.neutral),
+                ],
               ),
             ],
             const SizedBox(height: Space.lg),
-            Reveal(
-              index: 5,
-              child: _Photos(label: l.personPhotos, seed: person.name),
-            ),
+            _Photos(label: l.personPhotos),
           ],
         ),
       ),
@@ -121,6 +102,7 @@ class PersonProfileScreen extends ConsumerWidget {
       AppBar(
         title: Text(title),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(LucideIcons.arrowLeft),
           color: colors.textPrimary,
           onPressed: () => context.pop(),
@@ -128,9 +110,8 @@ class PersonProfileScreen extends ConsumerWidget {
       );
 }
 
-/// Identity block: a large brand-ringed avatar beside the name and the
-/// "<class> · school" line. The ring uses the shared avatar gradient so a person
-/// keeps a consistent, colourful frame across the app.
+/// Identity block: an 80 px avatar with a hairline border beside the name and
+/// the "<class> · school" line. Flat — no ring, no shadow.
 class _Header extends StatelessWidget {
   const _Header({required this.person});
 
@@ -141,20 +122,14 @@ class _Header extends StatelessWidget {
     final colors = context.colors;
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.all(3),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: AppGradients.avatarRing,
-            boxShadow: Shadows.lift,
+            border: Border.all(color: colors.border, width: Stroke.hairline),
           ),
-          child: Container(
-            padding: const EdgeInsets.all(3),
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: colors.surface),
-            child: Avatar(name: person.name, size: 80),
-          ),
+          child: Avatar(name: person.name, size: 80),
         ),
         const SizedBox(width: Space.lg),
         Expanded(
@@ -164,7 +139,7 @@ class _Header extends StatelessWidget {
             children: [
               Text(
                 person.name,
-                style: AppText.h2.copyWith(color: colors.textPrimary, fontSize: 19),
+                style: AppText.h2.copyWith(color: colors.textPrimary),
               ),
               const SizedBox(height: Space.xs),
               Text(
@@ -180,19 +155,18 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// One "icon + label + value" personality line (reading / listening). Shows
-/// [empty] softly when [value] is blank, so the line never reads as broken.
+/// One "icon + label + value" personality line (reading / listening). The icon
+/// is neutral grey. Shows [empty] softly when [value] is blank, so the line
+/// never reads as broken.
 class _BioLine extends StatelessWidget {
   const _BioLine({
     required this.icon,
-    required this.color,
     required this.label,
     required this.value,
     required this.empty,
   });
 
   final IconData icon;
-  final Color color;
   final String label;
   final String value;
   final String empty;
@@ -206,7 +180,7 @@ class _BioLine extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 16, color: color),
+          child: Icon(icon, size: 16, color: colors.textSecondary),
         ),
         const SizedBox(width: Space.sm),
         Expanded(
@@ -233,14 +207,13 @@ class _BioLine extends StatelessWidget {
   }
 }
 
-/// A decorative photo wall: six gradient placeholder tiles with a faint image
-/// glyph. Purely ornamental — no real or photorealistic imagery is used or
-/// implied (the app collects no child media in this phase).
+/// A flat photo wall: six grey placeholder tiles with a faint image glyph.
+/// Purely ornamental — no real or photorealistic imagery is used or implied
+/// (the app collects no child media in this phase). No gradient.
 class _Photos extends StatelessWidget {
-  const _Photos({required this.label, required this.seed});
+  const _Photos({required this.label});
 
   final String label;
-  final String seed;
 
   static const _count = 6;
 
@@ -256,22 +229,16 @@ class _Photos extends StatelessWidget {
           crossAxisCount: 3,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: Space.sm,
-          crossAxisSpacing: Space.sm,
+          mainAxisSpacing: 2,
+          crossAxisSpacing: 2,
           children: [
             for (var i = 0; i < _count; i++)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: AppGradients.of(
-                    AppAccents.all[
-                        (seed.hashCode.abs() + i) % AppAccents.all.length],
-                  ),
-                  borderRadius: BorderRadius.circular(Radii.media),
-                ),
+              ColoredBox(
+                color: colors.skeleton,
                 child: Center(
                   child: Icon(
                     LucideIcons.image,
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: colors.textTertiary,
                     size: 28,
                   ),
                 ),

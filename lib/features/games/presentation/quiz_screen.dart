@@ -3,13 +3,11 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
 import 'package:sinfagram/shared/widgets/app_button.dart';
-import 'package:sinfagram/shared/widgets/icon_tile.dart';
 
 /// A single rapid-quiz question. Local, offline demo content only.
 class _QuizQuestion {
@@ -45,7 +43,8 @@ enum _Phase { intro, playing, result }
 
 /// A solo, offline, 10-question rapid quiz (docs/07 §7.5 — variety alongside the
 /// class battle and league). No network, no images, class-neutral: it is a warm-
-/// up, not a graded score. Options flash green/red on lock, a trophy caps the run.
+/// up, not a graded score. On lock the correct pick fills blue and a wrong pick
+/// fills red; a trophy caps the run.
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
 
@@ -140,8 +139,8 @@ class _QuizScreenState extends State<QuizScreen> {
                 children: [
                   Reveal(
                       index: 0,
-                      child: const IconTile(LucideIcons.brain,
-                          color: AppAccents.violet, size: 96)),
+                      child: _RewardCircle(
+                          icon: LucideIcons.brain, colors: colors)),
                   const SizedBox(height: Space.lg),
                   Reveal(
                     index: 1,
@@ -257,21 +256,10 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Gradient trophy tile — the reward moment.
+            // Flat reward circle — no gradient, no confetti.
             Reveal(
               index: 0,
-              child: Container(
-                width: 98,
-                height: 98,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: AppGradients.primary,
-                  borderRadius: BorderRadius.circular(Radii.card),
-                  boxShadow: Shadows.lift,
-                ),
-                child: const Icon(LucideIcons.trophy,
-                    color: Colors.white, size: 46),
-              ),
+              child: _RewardCircle(icon: LucideIcons.trophy, colors: colors),
             ),
             const SizedBox(height: Space.lg),
             Reveal(
@@ -292,7 +280,7 @@ class _QuizScreenState extends State<QuizScreen> {
               index: 3,
               child: Text('$_score / $_total',
                   style: AppText.numeric
-                      .copyWith(fontSize: 46, color: colors.primary)),
+                      .copyWith(fontSize: 24, color: colors.textPrimary)),
             ),
             const SizedBox(height: Space.xl),
             Reveal(
@@ -349,12 +337,35 @@ class _CloseButton extends StatelessWidget {
   }
 }
 
+/// A flat reward disc — a soft primarySubtle circle with a neutral glyph. Used
+/// for the intro and the result moment; no gradient, no shadow, no confetti.
+class _RewardCircle extends StatelessWidget {
+  const _RewardCircle({required this.icon, required this.colors});
+
+  final IconData icon;
+  final AppColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 96,
+      height: 96,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.primarySubtle,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: colors.textPrimary, size: 40),
+    );
+  }
+}
+
 /// Visual state of an option tile after (or before) the answer is locked.
 enum _OptStatus { idle, correct, wrong, muted }
 
-/// A full-width answer button. Rests on surface + a strong hairline; on lock the
-/// correct choice fills solid green (white text) and a wrong pick fills red, both
-/// over a 220 ms colour tween. Untouched options fade back to 55%.
+/// A full-width answer button. Rests on surface + a hairline border; on lock the
+/// correct choice fills blue (white text) and a wrong pick fills red, both over a
+/// 220 ms colour tween. Untouched options fade back to 55%.
 class _OptionTile extends StatelessWidget {
   const _OptionTile({
     required this.label,
@@ -376,13 +387,15 @@ class _OptionTile extends StatelessWidget {
         switch (status) {
       _OptStatus.idle => (
           colors.surface,
-          colors.borderStrong,
+          colors.border,
           colors.textPrimary,
           null,
         ),
+      // Correct pick fills the single blue action colour (no green in this
+      // system).
       _OptStatus.correct => (
-          colors.success,
-          colors.success,
+          colors.primary,
+          colors.primary,
           colors.textOnPrimary,
           LucideIcons.check,
         ),
@@ -395,7 +408,7 @@ class _OptionTile extends StatelessWidget {
       // Muted keeps the resting look; the enclosing opacity recedes it.
       _OptStatus.muted => (
           colors.surface,
-          colors.borderStrong,
+          colors.border,
           colors.textPrimary,
           null,
         ),

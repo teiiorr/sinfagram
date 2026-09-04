@@ -5,9 +5,9 @@ import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 
 /// The blank-slate for any list, feed or search that has nothing to show.
-/// Deliberately quiet: an icon, two lines, and an optional action — no
-/// illustration or mascot, so it reads as a state and not a distraction.
-/// docs/05 §5.5.
+/// Instagram-quiet: a single large outline icon, a title, one line of secondary
+/// copy, and an optional action — no halo, no illustration, no mascot, so it
+/// reads as a state and not a distraction. Centred. docs/05 §5.5.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -33,23 +33,14 @@ class EmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // A soft coloured halo behind the glyph — friendlier and less
-            // monotone than a bare grey icon. Illustrative only, so kept out of
-            // the a11y tree.
-            Container(
-              width: 88,
-              height: 88,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: colors.primarySubtle, shape: BoxShape.circle),
-              child: Icon(icon,
-                  size: 40, color: colors.primary, semanticLabel: null),
-            ),
+            // A bare outline glyph — illustrative only, so kept out of the a11y
+            // tree.
+            Icon(icon, size: 96, color: colors.textPrimary),
             const SizedBox(height: Space.md),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: AppText.h2.copyWith(color: colors.textPrimary),
+              style: AppText.h1.copyWith(color: colors.textPrimary),
             ),
             if (message.isNotEmpty) ...[
               const SizedBox(height: Space.xs),

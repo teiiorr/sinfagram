@@ -41,7 +41,7 @@ class TeacherCodeScreen extends ConsumerWidget {
                     child: Text(
                       '473921',
                       textAlign: TextAlign.center,
-                      style: AppText.display.copyWith(
+                      style: AppText.h1.copyWith(
                         color: colors.textPrimary,
                         letterSpacing: 8,
                       ),

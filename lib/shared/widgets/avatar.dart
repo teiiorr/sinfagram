@@ -4,9 +4,10 @@ import 'package:sinfagram/core/theme/colors.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
 
-/// Initials avatar. No network image in this phase — the initials on a
-/// deterministic subtle tint stand in for a photo, so a person keeps a stable
-/// colour everywhere they appear (feed, member lists, mentions).
+/// Initials avatar — Instagram flat. No network image in this phase: the initials
+/// sit on a single neutral circle ([AppColors.primarySubtle] fill,
+/// [AppColors.textSecondary] glyphs), the same for everyone, with no accent
+/// gradient. Fully round.
 class Avatar extends StatelessWidget {
   const Avatar({super.key, required this.name, this.size = 36});
 
@@ -17,17 +18,6 @@ class Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    // Five subtle tints. hashCode can be negative and Dart's % preserves the
-    // sign, so take the magnitude before indexing.
-    final tints = <Color>[
-      colors.primarySubtle,
-      colors.successSubtle,
-      colors.warningSubtle,
-      colors.accentSubtle,
-      colors.surfaceRaised,
-    ];
-    final tint = tints[name.hashCode.abs() % tints.length];
-
     return Semantics(
       label: name,
       // Decorative once labelled — hide the initials glyphs from the reader.
@@ -37,7 +27,7 @@ class Avatar extends StatelessWidget {
           height: size,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: tint,
+            color: colors.primarySubtle,
             borderRadius: BorderRadius.circular(Radii.avatar),
           ),
           child: Text(

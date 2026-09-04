@@ -30,7 +30,20 @@ class MunozaraScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: colors.bg,
-      appBar: AppBar(title: Text(l.munozaraTitle)),
+      appBar: AppBar(
+        title: Text(l.munozaraTitle),
+        actions: [
+          // Compose a new text post. Icon-only top-bar action (Instagram-style,
+          // black chrome icon), 24px glyph on a 48px IconButton tap target.
+          IconButton(
+            tooltip: l.munozaraNew,
+            icon: const Icon(LucideIcons.plus, size: 24),
+            color: colors.textPrimary,
+            onPressed: () => context.push('/compose?mode=text'),
+          ),
+          const SizedBox(width: Space.xs),
+        ],
+      ),
       body: SafeArea(
         child: posts.isEmpty
             ? EmptyState(
@@ -55,11 +68,6 @@ class MunozaraScreen extends ConsumerWidget {
                   );
                 },
               ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: l.munozaraNew,
-        onPressed: () => context.push('/compose?mode=text'),
-        child: const Icon(LucideIcons.penLine),
       ),
     );
   }

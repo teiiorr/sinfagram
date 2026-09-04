@@ -41,17 +41,19 @@ abstract final class AppGradients {
     colors: [Color(0xFF7A5CF0), Color(0xFFE6568F)],
   );
 
-  /// Unseen story ring — a full-spectrum conic sweep (rings are static in this
-  /// build; product owner asked for no spin).
-  static const storyRing = SweepGradient(
+  /// Unseen story ring — the classic Instagram 45° ring. THE ONLY gradient in
+  /// the entire product. Static (no spin).
+  static const storyRing = LinearGradient(
+    begin: Alignment.bottomLeft,
+    end: Alignment.topRight,
     colors: [
-      Color(0xFF6A4CE6),
-      Color(0xFFEB4D8C),
-      Color(0xFFF2802E),
-      Color(0xFF12B39B),
-      Color(0xFF3A62E0),
-      Color(0xFF6A4CE6),
+      Color(0xFFF58529),
+      Color(0xFFFEDA77),
+      Color(0xFFDD2A7B),
+      Color(0xFF8134AF),
+      Color(0xFF515BD4),
     ],
+    stops: [0.0, 0.25, 0.5, 0.75, 1.0],
   );
 
   /// Reward / win moments only.

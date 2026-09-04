@@ -41,12 +41,24 @@ class PupilShell extends StatelessWidget {
               initialLocation: branch == navigationShell.currentIndex);
         },
         items: [
-          AppNavItem(icon: LucideIcons.house, label: l.navFeed),
-          AppNavItem(icon: LucideIcons.messagesSquare, label: l.navMunozara),
+          AppNavItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
+              label: l.navFeed),
+          AppNavItem(
+              icon: Icons.chat_bubble_outline,
+              activeIcon: Icons.chat_bubble,
+              label: l.navMunozara),
           AppNavItem(
               icon: LucideIcons.plus, label: l.navCreate, isAction: true),
-          AppNavItem(icon: LucideIcons.swords, label: l.navGames),
-          AppNavItem(icon: LucideIcons.user, label: l.navProfile),
+          AppNavItem(
+              icon: Icons.sports_esports_outlined,
+              activeIcon: Icons.sports_esports,
+              label: l.navGames),
+          AppNavItem(
+              icon: Icons.person_outline,
+              activeIcon: Icons.person,
+              label: l.navProfile),
         ],
       ),
     );

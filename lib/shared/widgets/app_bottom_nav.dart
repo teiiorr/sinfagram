@@ -3,26 +3,36 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
-import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
-import 'package:sinfagram/core/theme/typography.dart';
 
 class AppNavItem {
-  const AppNavItem(
-      {required this.icon, required this.label, this.isAction = false});
+  const AppNavItem({
+    required this.icon,
+    required this.label,
+    this.activeIcon,
+    this.isAction = false,
+  });
+
+  /// The resting (outline) glyph.
   final IconData icon;
+
+  /// The filled glyph shown when this tab is selected. When null, [icon] is used
+  /// for both states.
+  final IconData? activeIcon;
+
   final String label;
 
-  /// An action item (the centre "Create" FAB) renders as a prominent gradient
-  /// rounded-square and never shows the sliding selection blob.
+  /// An action item (the centre "Create" slot) renders as a plain icon and never
+  /// takes the selected/filled treatment.
   final bool isAction;
 }
 
-/// Floating bottom navigation ("Play" redesign): a rounded, elevated bar that
-/// floats above the content, an animated `primarySubtle` blob that slides
-/// between tabs, and a gradient rounded-square create FAB. Labels always
-/// visible; a single dot (never a number) marks [dotIndex].
+/// Instagram bottom navigation: a flat 49px bar on [AppColors.surface] with a
+/// single hairline top border, five icon-only slots, no labels, no shadow, no
+/// floating margin, no sliding blob, and no gradient FAB. The selected tab shows
+/// a filled glyph; the rest are outlines — both in [AppColors.textPrimary], so
+/// selection reads by fill, never by colour. A single dot (never a number) marks
+/// [dotIndex].
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     super.key,
@@ -37,64 +47,38 @@ class AppBottomNav extends StatelessWidget {
   final ValueChanged<int> onTap;
   final int? dotIndex;
 
+  /// Instagram's tab bar height.
+  static const double _barHeight = 49;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
-        child: RepaintBoundary(
-          child: Container(
-            height: 64,
-            decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: BorderRadius.circular(Radii.nav),
-              border:
-                  Border.all(color: colors.border, width: Stroke.hairline),
-              boxShadow: Shadows.soft,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth = constraints.maxWidth / items.length;
-                const inset = 10.0;
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    // Sliding blob behind the active tab.
-                    AnimatedPositioned(
-                      duration: motionOf(context, Motion.slow),
-                      curve: Motion.spring,
-                      left: itemWidth * currentIndex + inset,
-                      top: 9,
-                      width: itemWidth - inset * 2,
-                      height: 46,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: colors.primarySubtle,
-                          borderRadius: BorderRadius.circular(17),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        for (var i = 0; i < items.length; i++)
-                          Expanded(
-                            child: _NavItem(
-                              item: items[i],
-                              selected: i == currentIndex,
-                              dot: i == dotIndex,
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                onTap(i);
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+    return RepaintBoundary(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.surface,
+          border: Border(
+            top: BorderSide(color: colors.border, width: Stroke.hairline),
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: _barHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                for (var i = 0; i < items.length; i++)
+                  _NavItem(
+                    item: items[i],
+                    selected: i == currentIndex,
+                    dot: i == dotIndex,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      onTap(i);
+                    },
+                  ),
+              ],
             ),
           ),
         ),
@@ -104,11 +88,12 @@ class AppBottomNav extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem(
-      {required this.item,
-      required this.selected,
-      required this.onTap,
-      this.dot = false});
+  const _NavItem({
+    required this.item,
+    required this.selected,
+    required this.onTap,
+    this.dot = false,
+  });
 
   final AppNavItem item;
   final bool selected;
@@ -119,57 +104,29 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    // The centre "Create" FAB: a gradient rounded-square, tilted, glowing.
-    if (item.isAction) {
-      return Semantics(
-        button: true,
-        label: item.label,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          child: Center(
-            child: Transform.rotate(
-              angle: -0.105, // ~ -6°
-              child: Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  gradient: AppGradients.primary,
-                  borderRadius: BorderRadius.circular(Radii.fab),
-                  boxShadow: Shadows.lift,
-                ),
-                child: Transform.rotate(
-                  angle: 0.105,
-                  child: const Icon(LucideIcons.plus,
-                      size: 26, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    // The create slot is a plain "+" — no FAB, no fill treatment.
+    final IconData icon = item.isAction
+        ? LucideIcons.plus
+        : (selected ? (item.activeIcon ?? item.icon) : item.icon);
 
-    final color = selected ? colors.primary : colors.textSecondary;
     return Semantics(
-      selected: selected,
+      selected: !item.isAction && selected,
       button: true,
       label: item.label,
-      child: InkWell(
+      child: InkResponse(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(17),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
+        radius: 24,
+        containedInkWell: false,
+        splashColor: colors.primary.withValues(alpha: 0.06),
+        highlightColor: colors.primary.withValues(alpha: 0.06),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(
+            child: Stack(
               clipBehavior: Clip.none,
               children: [
-                AnimatedScale(
-                  scale: selected ? 1.15 : 1.0,
-                  duration: motionOf(context, Motion.base),
-                  curve: Motion.spring,
-                  child: Icon(item.icon, size: 24, color: color),
-                ),
+                Icon(icon, size: 24, color: colors.textPrimary),
                 if (dot)
                   Positioned(
                     right: -3,
@@ -186,17 +143,7 @@ class _NavItem extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 3),
-            AnimatedDefaultTextStyle(
-              duration: motionOf(context, Motion.fast),
-              style: AppText.label.copyWith(
-                  fontSize: 10.5,
-                  color: color,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600),
-              child: Text(item.label,
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-            ),
-          ],
+          ),
         ),
       ),
     );

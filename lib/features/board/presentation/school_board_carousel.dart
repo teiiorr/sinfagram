@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:sinfagram/core/localization/l10n/app_l10n.dart';
 import 'package:sinfagram/core/theme/colors.dart';
-import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/motion.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
@@ -15,23 +13,21 @@ import 'package:sinfagram/features/board/application/board_controller.dart';
 import 'package:sinfagram/features/board/domain/board.dart';
 import 'package:sinfagram/shared/motion/motion_widgets.dart';
 
-/// One card of the school-board carousel — a single board item flattened into an
-/// icon + category + title + body, so announcements, homework and the current
-/// lesson can share one auto-advancing strip.
+/// One card of the school-board carousel — a single board item flattened into a
+/// category + title + body, so announcements, homework and the current lesson
+/// can share one auto-advancing strip.
 class _BoardSlide {
-  const _BoardSlide(this.icon, this.accent, this.category, this.title, this.body);
-  final IconData icon;
-  final Color accent;
+  const _BoardSlide(this.category, this.title, this.body);
   final String category;
   final String title;
   final String body;
 }
 
 /// A swipeable, auto-advancing carousel of the SCHOOL board for the top of the
-/// feed — same mechanism as the friends slide (product-owner: "the school board
-/// should be a slide too, exactly the same way"). Rotates every 3s, honours
-/// reduce-motion by staying purely swipeable, and taps through to the full
-/// board. All motion is compositing-only.
+/// feed (product-owner: "the school board should be a slide too"). Rotates every
+/// 3s, honours reduce-motion by staying purely swipeable, and taps through to the
+/// full board. Each slide is a flat card — white surface, one hairline border,
+/// no gradient, no shadow. All motion is compositing-only.
 class SchoolBoardCarousel extends ConsumerStatefulWidget {
   const SchoolBoardCarousel({super.key});
 
@@ -41,7 +37,7 @@ class SchoolBoardCarousel extends ConsumerStatefulWidget {
 }
 
 class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
-  static const _cardHeight = 150.0;
+  static const _cardHeight = 120.0;
   static const _interval = Duration(seconds: 3);
 
   final PageController _controller = PageController(viewportFraction: 0.9);
@@ -89,8 +85,6 @@ class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
     final slides = <_BoardSlide>[];
     for (final lesson in board.schedule.where((s) => s.isCurrent)) {
       slides.add(_BoardSlide(
-        LucideIcons.clock,
-        AppAccents.green,
         l.boardNow,
         lesson.subject,
         '${lesson.time} · ${lesson.room}',
@@ -102,8 +96,6 @@ class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
     ];
     for (final a in pinnedFirst) {
       slides.add(_BoardSlide(
-        LucideIcons.bell,
-        AppAccents.amber,
         l.boardAnnouncements,
         a.title,
         a.body,
@@ -111,8 +103,6 @@ class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
     }
     for (final h in board.homework) {
       slides.add(_BoardSlide(
-        LucideIcons.clipboardList,
-        AppAccents.blue,
         l.boardHomework,
         h.subject,
         '${h.title} · ${h.due}',
@@ -136,15 +126,9 @@ class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
-          child: Row(
-            children: [
-              Icon(LucideIcons.clipboardList, size: 18, color: colors.primary),
-              const SizedBox(width: Space.xs),
-              Text(
-                l.boardTitle,
-                style: AppText.h3.copyWith(color: colors.textPrimary),
-              ),
-            ],
+          child: Text(
+            l.boardTitle,
+            style: AppText.h3.copyWith(color: colors.textPrimary),
           ),
         ),
         const SizedBox(height: Space.sm),
@@ -164,57 +148,41 @@ class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
   }
 
   Widget _card(BuildContext context, _BoardSlide slide) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Space.xs),
       child: TapScale(
         onTap: () => context.push('/board'),
         child: Container(
           decoration: BoxDecoration(
-            gradient: AppGradients.of(slide.accent),
+            color: colors.surface,
+            border: Border.all(color: colors.border, width: Stroke.hairline),
             borderRadius: BorderRadius.circular(Radii.hero),
-            boxShadow: Shadows.lift,
           ),
-          padding: const EdgeInsets.all(Space.lg),
+          padding: const EdgeInsets.all(Space.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.22),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(slide.icon, size: 20, color: Colors.white),
-                  ),
-                  const SizedBox(width: Space.sm),
-                  Expanded(
-                    child: Text(
-                      slide.category,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.caption.copyWith(color: Colors.white70),
-                    ),
-                  ),
-                ],
+              Text(
+                slide.category,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.caption.copyWith(color: colors.textSecondary),
               ),
-              const SizedBox(height: Space.sm),
+              const SizedBox(height: Space.xs),
               Text(
                 slide.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppText.bodyStrong.copyWith(color: Colors.white),
+                style: AppText.bodyStrong.copyWith(color: colors.textPrimary),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: Space.xs),
               Expanded(
                 child: Text(
                   slide.body,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: AppText.body.copyWith(color: Colors.white),
+                  style: AppText.body.copyWith(color: colors.textSecondary),
                 ),
               ),
             ],
@@ -236,7 +204,7 @@ class _SchoolBoardCarouselState extends ConsumerState<SchoolBoardCarousel> {
             width: i == active ? Space.lg : Space.sm,
             height: Space.sm,
             decoration: BoxDecoration(
-              color: i == active ? colors.primary : colors.border,
+              color: i == active ? colors.primary : colors.textTertiary,
               borderRadius: BorderRadius.circular(Radii.avatar),
             ),
           ),
