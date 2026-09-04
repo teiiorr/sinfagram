@@ -477,5 +477,8 @@
   "gamesScore": "Ball",
   "boardClassHub": "Sinf faoliyati",
   "gamesQuizClose": "Yopish",
-  "gamesQuizQuestion": "Savol"
+  "gamesQuizQuestion": "Savol",
+  "accountsTitle": "Akkauntlar",
+  "accountSwitch": "Akkauntni almashtirish",
+  "accountSwitched": "Akkaunt almashtirildi"
 }

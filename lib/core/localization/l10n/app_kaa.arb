@@ -310,5 +310,8 @@
   "gamesScore": "Ball",
   "boardClassHub": "Klass jumısları",
   "gamesQuizClose": "Jabıw",
-  "gamesQuizQuestion": "Soraw"
+  "gamesQuizQuestion": "Soraw",
+  "accountsTitle": "Akkauntlar",
+  "accountSwitch": "Akkauntti almastırıw",
+  "accountSwitched": "Akkaunt almastırıldı"
 }

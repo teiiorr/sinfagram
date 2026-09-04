@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:sinfagram/core/storage/prefs.dart';
+import 'package:sinfagram/features/accounts/application/accounts_controller.dart';
 import 'package:sinfagram/features/auth/application/session_controller.dart';
 import 'package:sinfagram/features/people/domain/person.dart';
 
@@ -27,21 +28,29 @@ final myProfileProvider = NotifierProvider<MyProfileController, Person>(
 );
 
 class MyProfileController extends Notifier<Person> {
-  static const _key = 'me.profile';
+  // Persistence key is namespaced by the active account so each account keeps
+  // its own edited profile.
+  String _key = 'me.profile';
 
   @override
   Person build() {
     final session = ref.watch(sessionProvider);
+    final name = session?.displayName ?? 'Men';
+    _key = 'me.profile.${name.replaceAll(' ', '_')}';
+
+    // Defaults: if this identity is one of the mock accounts, seed its profile
+    // so switching accounts shows a populated "About me" out of the box.
+    final seed = accountForName(ref, name);
     var me = Person(
       id: 'me',
-      name: session?.displayName ?? 'Men',
+      name: name,
       className: session?.classLabel ?? '7-B',
-      bio: '',
-      reading: '',
-      listening: '',
-      interests: const [],
+      bio: seed?.bio ?? '',
+      reading: seed?.reading ?? '',
+      listening: seed?.listening ?? '',
+      interests: seed?.interests ?? const [],
     );
-    // Hydrate the editable "About me" fields from local storage.
+    // Local edits override the seed.
     final raw = ref.read(sharedPrefsProvider).getString(_key);
     if (raw != null) {
       try {

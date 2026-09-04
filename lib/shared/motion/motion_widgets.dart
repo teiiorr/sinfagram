@@ -60,10 +60,18 @@ class _TapScaleState extends State<TapScale> {
               if (widget.haptic) HapticFeedback.selectionClick();
               widget.onTap!();
             },
-      child: AnimatedOpacity(
-        opacity: _down ? 0.7 : 1.0,
-        duration: motionOf(context, const Duration(milliseconds: 100)),
-        child: widget.child,
+      // A soft, relaxing press: the surface eases down a touch and dims
+      // slightly, then settles back — every tap gets a gentle response.
+      child: AnimatedScale(
+        scale: _down ? 0.96 : 1.0,
+        duration: motionOf(context, const Duration(milliseconds: 190)),
+        curve: Curves.easeOut,
+        child: AnimatedOpacity(
+          opacity: _down ? 0.88 : 1.0,
+          duration: motionOf(context, const Duration(milliseconds: 130)),
+          curve: Curves.easeOut,
+          child: widget.child,
+        ),
       ),
     );
   }

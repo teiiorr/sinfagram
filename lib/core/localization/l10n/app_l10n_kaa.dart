@@ -1066,4 +1066,13 @@ class AppL10nKaa extends AppL10n {
 
   @override
   String get gamesQuizQuestion => 'Soraw';
+
+  @override
+  String get accountsTitle => 'Akkauntlar';
+
+  @override
+  String get accountSwitch => 'Akkauntti almastırıw';
+
+  @override
+  String get accountSwitched => 'Akkaunt almastırıldı';
 }

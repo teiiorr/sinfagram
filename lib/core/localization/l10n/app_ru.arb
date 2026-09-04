@@ -310,5 +310,8 @@
   "gamesScore": "Очки",
   "boardClassHub": "Активности класса",
   "gamesQuizClose": "Закрыть",
-  "gamesQuizQuestion": "Вопрос"
+  "gamesQuizQuestion": "Вопрос",
+  "accountsTitle": "Аккаунты",
+  "accountSwitch": "Сменить аккаунт",
+  "accountSwitched": "Аккаунт изменён"
 }

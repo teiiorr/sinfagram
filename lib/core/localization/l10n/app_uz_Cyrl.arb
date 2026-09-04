@@ -310,5 +310,8 @@
   "gamesScore": "Балл",
   "boardClassHub": "Синф фаолияти",
   "gamesQuizClose": "Ёпиш",
-  "gamesQuizQuestion": "Савол"
+  "gamesQuizQuestion": "Савол",
+  "accountsTitle": "Аккаунтлар",
+  "accountSwitch": "Аккаунтни алмаштириш",
+  "accountSwitched": "Аккаунт алмаштирилди"
 }

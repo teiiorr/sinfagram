@@ -1104,4 +1104,13 @@ class AppL10nRu extends AppL10n {
 
   @override
   String get gamesQuizQuestion => 'Вопрос';
+
+  @override
+  String get accountsTitle => 'Аккаунты';
+
+  @override
+  String get accountSwitch => 'Сменить аккаунт';
+
+  @override
+  String get accountSwitched => 'Аккаунт изменён';
 }

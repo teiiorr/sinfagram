@@ -162,3 +162,22 @@ like numbers), private "Rahmat", reposts count-less + icon-only, no DMs,
 anonymous reports, no AI/real imagery of minors. The two prior tweaks stand:
 feed shows the school-board slide only (friends carousel removed); story rings
 static (no spin).
+
+## D-12 — Mock multi-account backend + richer touch animation (2026-09-05)
+
+**Mock backend.** Added a hardcoded multi-account layer so the app is usable
+without a server: `lib/features/accounts/` (Account model + accountsProvider with
+4 seeded pupils + currentAccountProvider derived from the session). An
+Instagram-style **account switcher** (profile menu row + tappable profile title
+with a chevron) calls `SessionController.switchAccount(...)`, which swaps the
+active identity. All per-account user data is now **namespaced by display name**
+— profile ("About me"), story slides, composed posts, private thanks and reposts
+each persist under a per-account key — so switching accounts shows that person's
+profile/posts/likes. A fresh profile is seeded from the account's data.
+
+**Richer touch animation (user override of the strict IG "opacity-only" press).**
+Product owner asked for "relaxing animations on every touch". `TapScale` now
+eases down to 0.96 scale + 0.88 opacity on press and settles back (smooth
+easeOut), on top of the existing InkWell ripples, double-tap heart burst and
+haptics. Still touch-response only (no scroll/entrance animations — the IG rule),
+and honours reduce-motion.

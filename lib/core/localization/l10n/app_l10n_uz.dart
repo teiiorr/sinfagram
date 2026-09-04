@@ -1066,6 +1066,15 @@ class AppL10nUz extends AppL10n {
 
   @override
   String get gamesQuizQuestion => 'Savol';
+
+  @override
+  String get accountsTitle => 'Akkauntlar';
+
+  @override
+  String get accountSwitch => 'Akkauntni almashtirish';
+
+  @override
+  String get accountSwitched => 'Akkaunt almashtirildi';
 }
 
 /// The translations for Uzbek, using the Cyrillic script (`uz_Cyrl`).
@@ -2129,4 +2138,13 @@ class AppL10nUzCyrl extends AppL10nUz {
 
   @override
   String get gamesQuizQuestion => 'Савол';
+
+  @override
+  String get accountsTitle => 'Аккаунтлар';
+
+  @override
+  String get accountSwitch => 'Аккаунтни алмаштириш';
+
+  @override
+  String get accountSwitched => 'Аккаунт алмаштирилди';
 }

@@ -10,6 +10,7 @@ import 'package:sinfagram/core/theme/colors.dart';
 import 'package:sinfagram/core/theme/gradients.dart';
 import 'package:sinfagram/core/theme/spacing.dart';
 import 'package:sinfagram/core/theme/typography.dart';
+import 'package:sinfagram/features/accounts/presentation/account_switcher_sheet.dart';
 import 'package:sinfagram/features/auth/application/session_controller.dart';
 import 'package:sinfagram/features/feed/application/day_page_controller.dart';
 import 'package:sinfagram/features/feed/domain/post.dart';
@@ -65,7 +66,33 @@ class MeScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: colors.bg,
         appBar: AppBar(
-          title: Text(name, style: AppText.h1.copyWith(color: colors.textPrimary)),
+          // Tapping the name opens the account switcher (Instagram-style).
+          title: InkWell(
+            onTap: () => showAppBottomSheet<void>(
+              context: context,
+              child: const AccountSwitcherSheet(),
+            ),
+            borderRadius: BorderRadius.circular(Radii.control),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Space.xs, vertical: Space.xs),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            AppText.h1.copyWith(color: colors.textPrimary)),
+                  ),
+                  const SizedBox(width: Space.xs),
+                  Icon(LucideIcons.chevronDown,
+                      size: 20, color: colors.textPrimary),
+                ],
+              ),
+            ),
+          ),
           actions: [
             IconButton(
               tooltip: l.meSettings,
@@ -643,6 +670,21 @@ class _MenuSheet extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _SheetRow(
+            icon: LucideIcons.repeat2,
+            label: l.accountSwitch,
+            onTap: () {
+              final nav = Navigator.of(context);
+              final rootCtx = nav.context;
+              nav.pop();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showAppBottomSheet<void>(
+                  context: rootCtx,
+                  child: const AccountSwitcherSheet(),
+                );
+              });
+            },
+          ),
           _SheetRow(
             icon: LucideIcons.users,
             label: l.classmatesOpen,

@@ -32,13 +32,20 @@ final repostedPostsProvider = Provider<List<Post>>((ref) =>
     _postsOf(ref.watch(dayPageProvider)).where((p) => p.repostedByMe).toList());
 
 class DayPageController extends Notifier<Loadable<DayPage>> {
-  static const _postsKey = 'feed.posts';
-  static const _thanksKey = 'feed.thanks';
-  static const _repostKey = 'feed.reposts';
+  // Namespaced per active account so each account keeps its own local posts,
+  // private thanks and reposts.
+  String _postsKey = 'feed.posts';
+  String _thanksKey = 'feed.thanks';
+  String _repostKey = 'feed.reposts';
 
   @override
   Loadable<DayPage> build() {
-    final classLabel = ref.watch(sessionProvider)?.classLabel ?? '7-B';
+    final session = ref.watch(sessionProvider);
+    final classLabel = session?.classLabel ?? '7-B';
+    final ns = (session?.displayName ?? 'me').replaceAll(' ', '_');
+    _postsKey = 'feed.posts.$ns';
+    _thanksKey = 'feed.thanks.$ns';
+    _repostKey = 'feed.reposts.$ns';
     final seed = _seed(classLabel);
     // Hydrate locally-composed posts and the viewer's private thanks set.
     final hydrated = DayPage(

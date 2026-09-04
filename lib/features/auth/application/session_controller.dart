@@ -76,6 +76,20 @@ class SessionController extends Notifier<AppSession?> {
     );
   }
 
+  /// Switch the active pupil identity (mock multi-account). Keeps the pupil role
+  /// and pre-granted gates so the switch lands straight on the feed.
+  void switchAccount({required String displayName, required String classLabel}) {
+    _chosenName = displayName;
+    _classLabel = classLabel;
+    state = AppSession(
+      role: AppRole.pupil,
+      displayName: displayName,
+      classLabel: classLabel,
+      consent: ConsentState.granted,
+      seenVisibility: true,
+    );
+  }
+
   void grantConsent() {
     final s = state;
     if (s != null) state = s.copyWith(consent: ConsentState.granted);

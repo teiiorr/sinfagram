@@ -13,12 +13,14 @@ final storiesProvider =
     NotifierProvider<StoriesController, List<Story>>(StoriesController.new);
 
 class StoriesController extends Notifier<List<Story>> {
-  static const _key = 'me.stories.captions';
+  String _key = 'me.stories.captions';
   var _seq = 0;
 
   @override
   List<Story> build() {
     final me = ref.watch(sessionProvider)?.displayName ?? 'Siz';
+    // Namespace saved slides per active account.
+    _key = 'me.stories.captions.${me.replaceAll(' ', '_')}';
 
     // The viewer's own story: a default slide plus any locally-saved slides.
     final mine = <StorySlide>[

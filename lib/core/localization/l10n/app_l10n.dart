@@ -1965,6 +1965,24 @@ abstract class AppL10n {
   /// In uz, this message translates to:
   /// **'Savol'**
   String get gamesQuizQuestion;
+
+  /// No description provided for @accountsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntlar'**
+  String get accountsTitle;
+
+  /// No description provided for @accountSwitch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntni almashtirish'**
+  String get accountSwitch;
+
+  /// No description provided for @accountSwitched.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkaunt almashtirildi'**
+  String get accountSwitched;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
